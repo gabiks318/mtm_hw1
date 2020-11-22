@@ -1,0 +1,3 @@
+C:/Users/Gabriel/Desktop/Technion/Programming Files/Matam/test/build/CMakeFiles/my_executable.dir
+C:/Users/Gabriel/Desktop/Technion/Programming Files/Matam/test/build/CMakeFiles/edit_cache.dir
+C:/Users/Gabriel/Desktop/Technion/Programming Files/Matam/test/build/CMakeFiles/rebuild_cache.dir

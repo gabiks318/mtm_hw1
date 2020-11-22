@@ -1,0 +1,7 @@
+[
+{
+  "directory": "C:/Users/Gabriel/Desktop/Technion/Programming Files/Matam/hw1/q1/build",
+  "command": "C:\\PROGRA~2\\MINGW-~1\\I686-8~1.0-P\\mingw32\\bin\\I6EEE3~1.EXE   -std=c99 --pedantic-errors -Wall -Werror -g -o CMakeFiles\\my_executable.dir\\helloworld.c.obj -c \"C:\\Users\\Gabriel\\Desktop\\Technion\\Programming Files\\Matam\\hw1\\main.c\"",
+  "file": "C:/Users/Gabriel/Desktop/Technion/Programming Files/Matam/hw1/q1/main.c"
+}
+]
