@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include "priority_queue.h"
 
+typedef struct node {
+    PQElement pq_element;
+    PQElementPriority pq_element_priority;
+    struct node* next;
+} *Node;
+
 struct PriorityQueue_t {
     CopyPQElement copy_element;
     FreePQElement free_element;
@@ -8,11 +14,7 @@ struct PriorityQueue_t {
     CopyPQElementPriority copy_priority;
     FreePQElementPriority free_priority;
     ComparePQElementPriorities compare_priority;
-    typedef struct node {
-    PQElement pq_element;
-    PQElementPriority pq_element_priority;
-    struct node* next;
-    } *Node;
+    Node node;
 };
 
 
@@ -40,8 +42,10 @@ FreePQElementPriority free_priority, ComparePQElementPriorities compare_priority
     return priority_queue;
 }
 
-void pqDestroy(PriorityQueue queue){
-    
+void pqDestroy(PriorityQueue queue)
+{
+    if(queue == NULL) return;
+
 }
 
 PriorityQueue pqCopy(PriorityQueue queue){
