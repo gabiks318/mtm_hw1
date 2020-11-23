@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-/**
+/** 
 * Generic Priority Queue Container
 *
 * Implements a priority queue container type.
