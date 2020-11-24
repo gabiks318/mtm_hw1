@@ -1,6 +1,7 @@
+#include <stdlib.h>
 #include "test_utilities.h"
 #include "../priority_queue.h"
-#include <stdlib.h>
+
 
 #define NUMBER_TESTS 4
 
