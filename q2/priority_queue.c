@@ -102,12 +102,17 @@ int pqGetSize(PriorityQueue queue)
     }
 
     int size = 0;
-    pqGetFirst(queue);
-    while(queue->iterator){
+    if(pqGetFirst(queue) == NULL) return size;
+    
+    while(true)
+    {
         size++;
-        pqGetNext(queue);
         printf("counting\n");
-    }
+        if(pqGetNext(queue) == NULL){
+            printf("%d \n", size);
+            return size;
+        }
+    } 
     printf("ending count \n");
     return size;
 }
@@ -272,7 +277,7 @@ PQElement pqGetFirst(PriorityQueue queue)
 PQElement pqGetNext(PriorityQueue queue)
 {
     printf("Getting next\n");
-    if (queue == NULL || queue->iterator->next == NULL)
+    if (queue == NULL || queue->iterator == NULL)
     {
         printf("pqGetNext: returning null\n");
         return NULL;
