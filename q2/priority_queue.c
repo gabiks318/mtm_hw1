@@ -4,6 +4,8 @@
 #include <assert.h>
 #include "priority_queue.h"
 
+#define PRINT false
+
 // Struct Declarations
 
 typedef struct node
@@ -95,7 +97,10 @@ PriorityQueue pqCopy(PriorityQueue queue)
 
 int pqGetSize(PriorityQueue queue)
 {
-    printf("Getting size\n");
+    if(PRINT){
+        printf("Getting size\n");
+    }
+    
     if (queue == NULL)
     {
         return -1;
@@ -107,13 +112,21 @@ int pqGetSize(PriorityQueue queue)
     while(true)
     {
         size++;
-        printf("counting\n");
+        if(PRINT){
+            printf("counting\n");
+        }
+        
         if(pqGetNext(queue) == NULL){
-            printf("%d \n", size);
+            if(PRINT){
+                printf("%d \n", size);
+            }
             return size;
         }
+    }
+    if(PRINT){
+        printf("ending count \n"); 
     } 
-    printf("ending count \n");
+    
     return size;
 }
 
@@ -141,17 +154,25 @@ PriorityQueueResult pqInsert(PriorityQueue queue, PQElement element, PQElementPr
     {
         return PQ_NULL_ARGUMENT;
     }
-    printf("Creating Node\n");
+    if(PRINT){
+        printf("Creating Node\n");
+    }
     Node newNode = createNode(element, priority, queue);
     if (newNode == NULL)
     {
         return PQ_OUT_OF_MEMORY;
     }
-    printf("Node created\n");
+    if(PRINT){
+        printf("Node created\n");
+    }
+    
 
     if (queue->list == NULL)         //if this is the first element in the queue
     {
-        printf("Inserting first node\n");
+        if(PRINT){
+            printf("Inserting first node\n");
+        }
+        
         queue->list = newNode;        
         return PQ_SUCCESS;
     }
@@ -159,11 +180,16 @@ PriorityQueueResult pqInsert(PriorityQueue queue, PQElement element, PQElementPr
     bool node_added = false;
     Node temp_node = NULL;
     pqGetFirst(queue);
-    printf("Inserting Node\n");
+    if(PRINT){
+        printf("Inserting Node\n");
+    }
+   
     while(queue->iterator)  
-    {
+    {    
+        
         if(queue->compare_priority(priority, queue->iterator->pq_element_priority) > 0)  //priority>curent priority so we add
         {
+           
             if(temp_node == NULL)
             {
                 queue->list = newNode;
@@ -175,7 +201,9 @@ PriorityQueueResult pqInsert(PriorityQueue queue, PQElement element, PQElementPr
             node_added = true;
             break;
         }
-        printf("In the loop \n");
+        if(PRINT){
+            printf("In the loop \n");
+        }
         temp_node = queue->iterator;
         pqGetNext(queue);
     }
@@ -184,7 +212,10 @@ PriorityQueueResult pqInsert(PriorityQueue queue, PQElement element, PQElementPr
         temp_node->next = newNode;
     }
     
-    printf("Node Inserted\n");
+    if(PRINT){
+        printf("Node Inserted\n");
+    }
+    
     return PQ_SUCCESS;
 }
 
@@ -259,33 +290,48 @@ PriorityQueueResult pqRemoveElement(PriorityQueue queue, PQElement element)
 
 PQElement pqGetFirst(PriorityQueue queue)
 {
-
+    if(PRINT){
+        printf("Getting first\n");
+    }
+    
     if (queue == NULL)
     {
         return NULL;
     }
-
-    queue->iterator = queue->list;
-    queue->iterator_defined = true;
-    if (queue->iterator == NULL)
+    
+    if (queue->list == NULL)
     {
         return NULL;
     }
-    return queue->iterator;
+    if(PRINT){
+        printf("Got First\n");
+    }
+    
+    queue->iterator = queue->list;
+    return queue->list->pq_element;
 }
 
 PQElement pqGetNext(PriorityQueue queue)
-{
-    printf("Getting next\n");
+{   
+    if(PRINT){
+        printf("Getting next\n");
+    }
+    
     if (queue == NULL || queue->iterator == NULL)
     {
-        printf("pqGetNext: returning null\n");
+        if(PRINT){
+            printf("pqGetNext: returning null\n");
+        }
+        
         return NULL;
     }
 
     queue->iterator = queue->iterator->next;
-    printf("Got next\n");
-    return queue->iterator;
+    if(PRINT){
+        printf("Got next\n");
+    }
+    
+    return queue->iterator->pq_element;
 }
 
 PriorityQueueResult pqClear(PriorityQueue queue)
