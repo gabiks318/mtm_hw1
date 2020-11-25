@@ -413,6 +413,6 @@ static void destroyNode(Node node, PriorityQueue queue)
     }
 
     queue->free_element(node->pq_element);
-    queue->free_priority(node->pq_element);
+    queue->free_priority(node->pq_element_priority);
     free(node);
 }
