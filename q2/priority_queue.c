@@ -13,7 +13,7 @@ typedef struct node
     PQElement pq_element;
     PQElementPriority pq_element_priority;
     struct node *next;
-} *Node;
+} * Node;
 
 struct PriorityQueue_t
 {
@@ -66,84 +66,82 @@ void pqDestroy(PriorityQueue queue)
         return;
     }
     pqClear(queue);
-    free(queue); 
+    free(queue);
 }
 
 PriorityQueue pqCopy(PriorityQueue queue)
 {
-    if(queue == NULL){
+    if (queue == NULL)
+    {
         return NULL;
     }
     PriorityQueue new_queue = pqCreate(queue->copy_element, queue->free_element,
-     queue->equal_elements, queue->copy_priority, queue->free_priority, queue->compare_priority);
-     
-    if(new_queue == NULL){
+                                       queue->equal_elements, queue->copy_priority, queue->free_priority, queue->compare_priority);
+
+    if (new_queue == NULL)
+    {
         return NULL;
     }
     pqGetFirst(queue);
     pqGetFirst(new_queue);
-    
+
     while (queue->iterator)
     {
         pqInsert(new_queue, queue->iterator->pq_element, queue->iterator->pq_element);
         pqGetNext(queue);
     }
-    
+
     queue->iterator_defined = false;
     new_queue->iterator_defined = false;
-    
+
     return new_queue;
 }
 
 int pqGetSize(PriorityQueue queue)
 {
-    if(PRINT){
+    if (PRINT)
+    {
         printf("Getting size\n");
     }
-    
+
     if (queue == NULL)
     {
         return -1;
     }
 
     int size = 0;
-    if(pqGetFirst(queue) == NULL) return size;
-    
-    while(true)
+    if (pqGetFirst(queue) == NULL)
+        return size;
+
+    while(queue->iterator != NULL)
     {
+
         size++;
-        if(PRINT){
-            printf("counting\n");
-        }
         
-        if(pqGetNext(queue) == NULL){
-            if(PRINT){
-                printf("%d \n", size);
-            }
-            return size;
-        }
+        pqGetNext(queue);
     }
-    if(PRINT){
-        printf("ending count \n"); 
-    } 
-    
+    if (PRINT)
+    {
+        printf("ending count \n");
+    }
+
     return size;
 }
 
 bool pqContains(PriorityQueue queue, PQElement element)
 {
-    if(queue == NULL || element == NULL)
+    if (queue == NULL || element == NULL)
     {
-        return false;    
+        return false;
     }
     pqGetFirst(queue);
-    while(queue->iterator)
+    while (queue->iterator)
     {
-       if(queue->equal_elements(element,queue->iterator->pq_element))
-       {
-           return true;
-       } 
-       pqGetNext(queue);
+        if (queue->equal_elements(element, queue->iterator->pq_element))
+        {
+            return true;
+        }
+        pqGetNext(queue);
     }
     return true;
 }
@@ -154,7 +152,8 @@ PriorityQueueResult pqInsert(PriorityQueue queue, PQElement element, PQElementPr
     {
         return PQ_NULL_ARGUMENT;
     }
-    if(PRINT){
+    if (PRINT)
+    {
         printf("Creating Node\n");
     }
     Node newNode = createNode(element, priority, queue);
@@ -162,77 +161,83 @@ PriorityQueueResult pqInsert(PriorityQueue queue, PQElement element, PQElementPr
     {
         return PQ_OUT_OF_MEMORY;
     }
-    if(PRINT){
+    if (PRINT)
+    {
         printf("Node created\n");
     }
-    
 
-    if (queue->list == NULL)         //if this is the first element in the queue
+    if (queue->list == NULL) //if this is the first element in the queue
     {
-        if(PRINT){
+        if (PRINT)
+        {
             printf("Inserting first node\n");
         }
-        
-        queue->list = newNode;        
+
+        queue->list = newNode;
         return PQ_SUCCESS;
     }
-    
+
     bool node_added = false;
     Node temp_node = NULL;
     pqGetFirst(queue);
-    if(PRINT){
+    if (PRINT)
+    {
         printf("Inserting Node\n");
     }
-   
-    while(queue->iterator)  
-    {    
-        
-        if(queue->compare_priority(priority, queue->iterator->pq_element_priority) > 0)  //priority>curent priority so we add
+
+    while (queue->iterator)
+    {
+
+        if (queue->compare_priority(priority, queue->iterator->pq_element_priority) > 0) //priority>curent priority so we add
         {
-           
-            if(temp_node == NULL)
+
+            if (temp_node == NULL)
             {
                 queue->list = newNode;
                 newNode->next = queue->iterator;
-            } else {
+            }
+            else
+            {
                 temp_node->next = newNode;
                 newNode->next = queue->iterator;
             }
             node_added = true;
             break;
         }
-        if(PRINT){
+        if (PRINT)
+        {
             printf("In the loop \n");
         }
         temp_node = queue->iterator;
         pqGetNext(queue);
     }
-    if(!node_added)
+    if (!node_added)
     {
         temp_node->next = newNode;
     }
-    
-    if(PRINT){
+
+    if (PRINT)
+    {
         printf("Node Inserted\n");
     }
-    
+
     return PQ_SUCCESS;
 }
 
 PriorityQueueResult pqChangePriority(PriorityQueue queue, PQElement element,
                                      PQElementPriority old_priority, PQElementPriority new_priority)
 {
-    if(queue == NULL || element == NULL || old_priority == NULL || new_priority ==NULL)
+    if (queue == NULL || element == NULL || old_priority == NULL || new_priority == NULL)
     {
         return PQ_NULL_ARGUMENT;
     }
-    if(!pqContains(queue,element))
+    if (!pqContains(queue, element))
     {
         return PQ_ELEMENT_DOES_NOT_EXISTS;
     }
     PQElement temp_element = queue->iterator->pq_element;
-    pqRemoveElement(queue ,queue->iterator->pq_element);
-    if(pqInsert(queue,temp_element,new_priority) == PQ_OUT_OF_MEMORY)
+    pqRemoveElement(queue, queue->iterator->pq_element);
+    if (pqInsert(queue, temp_element, new_priority) == PQ_OUT_OF_MEMORY)
     {
         return PQ_OUT_OF_MEMORY;
     }
@@ -242,35 +247,43 @@ PriorityQueueResult pqChangePriority(PriorityQueue queue, PQElement element,
 
 PriorityQueueResult pqRemove(PriorityQueue queue)
 {
-    if(queue == NULL)
+    if (queue == NULL)
     {
         return PQ_NULL_ARGUMENT;
     }
-    Node temp_node = pqGetFirst(queue);
-    queue->list = pqGetNext(queue);
+    pqGetFirst(queue);
+    Node temp_node = queue->iterator;
+    pqGetNext(queue);
+    queue->list = queue->iterator;
     queue->iterator_defined = false;
     destroyNode(temp_node, queue);
-    
+
     return PQ_SUCCESS;
 }
 
 PriorityQueueResult pqRemoveElement(PriorityQueue queue, PQElement element)
 {
-    if(queue == NULL || element == NULL){
+    if (queue == NULL || element == NULL)
+    {
         return PQ_NULL_ARGUMENT;
     }
     bool found = false;
     Node temp_node = NULL, node_to_remove = NULL;
     pqGetFirst(queue);
 
-    while(queue->iterator){
-        if(queue->equal_elements(queue->iterator->pq_element, element)){
+    while (queue->iterator)
+    {
+        if (queue->equal_elements(queue->iterator->pq_element, element))
+        {
             found = true;
-            if(temp_node == NULL){
+            if (temp_node == NULL)
+            {
                 node_to_remove = queue->iterator;
                 queue->list = pqGetNext(queue);
                 destroyNode(node_to_remove, queue);
-            } else {
+            }
+            else
+            {
                 node_to_remove = queue->iterator;
                 pqGetNext(queue);
                 destroyNode(node_to_remove, queue);
@@ -281,7 +294,8 @@ PriorityQueueResult pqRemoveElement(PriorityQueue queue, PQElement element)
         pqGetNext(queue);
     }
 
-    if(!found){
+    if (!found)
+    {
         return PQ_ELEMENT_DOES_NOT_EXISTS;
     }
 
@@ -290,59 +304,74 @@ PriorityQueueResult pqRemoveElement(PriorityQueue queue, PQElement element)
 
 PQElement pqGetFirst(PriorityQueue queue)
 {
-    if(PRINT){
+    if (PRINT)
+    {
         printf("Getting first\n");
     }
-    
+
     if (queue == NULL)
     {
         return NULL;
     }
-    
+
     if (queue->list == NULL)
     {
         return NULL;
     }
-    if(PRINT){
+    if (PRINT)
+    {
         printf("Got First\n");
     }
-    
+
     queue->iterator = queue->list;
     return queue->list->pq_element;
 }
 
 PQElement pqGetNext(PriorityQueue queue)
-{   
-    if(PRINT){
+{
+    if (PRINT)
+    {
         printf("Getting next\n");
     }
-    
+
     if (queue == NULL || queue->iterator == NULL)
     {
-        if(PRINT){
+        if (PRINT)
+        {
             printf("pqGetNext: returning null\n");
+        }
+
+        return NULL;
+    }
+   // if(queue->iterator->next == NULL)
+    queue->iterator = queue->iterator->next;
+    if (PRINT)
+    {
+        if(queue->iterator == NULL){
+            
+        }
+        printf("Got next\n");
+    }
+    if(queue->iterator == NULL){
+        if(PRINT){
+            printf("iterator is null\n");
         }
         
         return NULL;
     }
 
-    queue->iterator = queue->iterator->next;
-    if(PRINT){
-        printf("Got next\n");
-    }
-    
     return queue->iterator->pq_element;
 }
 
 PriorityQueueResult pqClear(PriorityQueue queue)
 {
-    if(queue == NULL)
+    if (queue == NULL)
     {
         return PQ_NULL_ARGUMENT;
     }
 
     int queue_size = pqGetSize(queue);
-    for(int i = 0; i < queue_size; i++)
+    for (int i = 0; i < queue_size; i++)
     {
         pqRemove(queue);
     }
@@ -352,7 +381,6 @@ PriorityQueueResult pqClear(PriorityQueue queue)
 
 static Node createNode(PQElement element, PQElementPriority priority, PriorityQueue queue)
 {
-    
 
     Node ptr = malloc(sizeof(*ptr));
     if (!ptr)
@@ -379,12 +407,12 @@ static Node createNode(PQElement element, PQElementPriority priority, PriorityQu
 
 static void destroyNode(Node node, PriorityQueue queue)
 {
-    if(node == NULL)
+    if (node == NULL)
     {
         return;
     }
 
     queue->free_element(node->pq_element);
     queue->free_priority(node->pq_element);
-    free(node);    
+    free(node);
 }

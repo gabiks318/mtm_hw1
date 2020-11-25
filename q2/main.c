@@ -72,20 +72,21 @@ destroyPQGetFirst:
 }
 
 bool testPQIterator() {
-    printf("Starting iterator test\n");
+    /* printf("Starting iterator test\n"); */
     bool result = true;
     PriorityQueue pq = pqCreate(copyIntGeneric, freeIntGeneric, equalIntsGeneric, copyIntGeneric, freeIntGeneric, compareIntsGeneric);
 
     int max_value = 10;
 
-    printf("Inserting values\n");
+    /* printf("Inserting values\n"); */
     for(int i=0; i< max_value; i++){
         ASSERT_TEST(pqInsert(pq, &i, &i) == PQ_SUCCESS, destroyPQIterator);
     }
-    printf("iterating\n");
+    /* printf("iterating\n"); */
     int i = 0;
     PQ_FOREACH(int*, iter, pq) {
-        printf("Iteration no : %d\n", i);
+       /*  printf("Iteration no : %d\n", i);
+        printf("element value: %d\n", *iter); */
         if (i != max_value) {
             ASSERT_TEST(iter != NULL,destroyPQIterator);
         } else {
