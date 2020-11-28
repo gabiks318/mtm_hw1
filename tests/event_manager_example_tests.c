@@ -7,7 +7,7 @@
 
 bool testEventManagerCreateDestroy() {
     bool result = true;
-    Date start_date = dateCreate(1,12,2020);
+    Date start_date = dateCreate(1,12,2020); 
     EventManager em = createEventManager(start_date);
 
     ASSERT_TEST(em != NULL, destroyEventManagerCreateDestroy);
