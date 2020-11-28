@@ -236,8 +236,10 @@ EventManagerResult emRemoveEvent(EventManager em, int event_id)
         return EM_EVENT_NOT_EXISTS;
     }
     PriorityQueueResult result = pqRemoveElement(em, event_to_remove);
-
-
+    if(result == PQ_SUCCESS)
+    {
+        return EM_SUCCESS;
+    }
 }
 
 EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_date)
