@@ -8,7 +8,7 @@
 
 struct Node_t{
     Member member;
-    struct Node_t *next;
+    Node next;
 };
 
 void memberListPrintDebug(char* text){

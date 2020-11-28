@@ -4,54 +4,31 @@
 #include "event_manager.h"
 #include "date.h"
 #include "priority_queue.h"
+#include "member_list.h"
+#include "member.h"
 
-typedef struct node{
-    Member member;
-    struct node *next;
-} * Node;
+typedef struct Node_t* Node;
 
-static Node nodeCreate(Member member);
-static void nodeDestroy(Node node);
-
-static Node nodeCreate(Member member)
-{
-    if(member == NULL) 
-    {
-        return EM_NULL_ARGUMENT;
-    }
-    Node node = malloc(sizeof(*node));
-    if(node == NULL)
-    {
-        return EM_OUT_OF_MEMORY;
-    }
-    node->member = member;
-    node->next = NULL;
-    return node;
-}
-static void nodeDestroy(Node node)
-{
-    // Doesn't free the member inside, should be done seperately
-    free(Node);
-}
 
 typedef struct event{
+    Date event_date;
     int event_id;
     char* event_name;
     Node members_list_event;
 } *Event;
 
-static Event eventCreate(char* event_name, int event_id);
+static Event eventCreate(char* event_name, int event_id, Date date);
 static void eventDestroy(Event event);
 static Event eventCopy(Event event);
 static bool eventEqual(Event event_1, Event event_2);
-static bool eventCheckMemberExist(int member_id);
-static int eventAddMember(Member member);
-static int eventRemoveMember(Member member);
+static bool eventCheckMemberExist(int member_id);//need to write?
+static int eventAddMember(Member member);//need to write?
+static int eventRemoveMember(Member member);//need to write?
 static bool eventExists(Date date, char* event_name); //need to write!
 static Event findEventByID(int event_id);//need to write!
 
 
-static Event eventCreate(char* event_name, int event_id)
+static Event eventCreate(char* event_name, int event_id, Date date)
 {
     if(event_name == NULL)
     {
@@ -61,6 +38,7 @@ static Event eventCreate(char* event_name, int event_id)
     {
         return EM_INVALID_EVENT_ID;
     }
+    // I think we neeed to also check if date is valid
     Event event = malloc(sizeof(*event));
     if(event == NULL){
         return EM_OUT_OF_MEMORY;
@@ -68,7 +46,8 @@ static Event eventCreate(char* event_name, int event_id)
     
     event->event_id = event_id;
     event->event_name = event_name;
-    event->members_list = NULL;
+    event->event_date = dateCopy(date);
+    event->members_list_event = NULL;
 
     return event;
 }
@@ -81,11 +60,12 @@ static void eventDestroy(Event event)
 
     Node node_to_destroy = event->members_list_event;
     Node temp = NULL;
-    while(next != NULL){
-        temp = node_to_destroy->next;
+    while(nodeGetNext(node_to_destroy) != NULL){
+        temp = nodeGetNext(node_to_destroy);
         free(node_to_destroy);
         node_to_destroy = temp;
     }
+    free(node_to_destroy);
     
     free(event);
 }
@@ -94,7 +74,7 @@ static Event eventCopy(Event event){
     if(event == NULL){
         return NULL;
     }
-    Event event_copy = eventCreate(event->event_name, event->event_id);
+    Event event_copy = eventCreate(event->event_name, event->event_id, event->event_date);
     event_copy->members_list_event = event->members_list_event;
 }
 
@@ -231,7 +211,7 @@ EventManagerResult emRemoveEvent(EventManager em, int event_id)
         return EM_INVALID_EVENT_ID;
     }
     Event event_to_remove = findEventByID(event_id);
-    if(event_to_remove == EM_EVENT_NOT_EXISTS)
+    if(event_to_remove == NULL)
     {
         return EM_EVENT_NOT_EXISTS;
     }
@@ -244,7 +224,33 @@ EventManagerResult emRemoveEvent(EventManager em, int event_id)
 
 EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_date)
 {
-    
+    if(em == NULL || event_id == NULL || new_date == NULL)
+    {
+        EM_NULL_ARGUMENT;
+    }
+    if(dateCompare(new_date, em->date_created) >= 0)
+    {
+        return EM_INVALID_DATE;
+    }
+    if(event_id < 0)
+    {
+        return EM_INVALID_EVENT_ID;
+    }
+    Event event_to_change = findEventByID(event_id);
+    if(event_to_change == NULL)
+    {
+        return EM_EVENT_ID_NOT_EXISTS;
+    }
+    if(eventExists(new_date, event_to_change->event_name))
+    {
+        return EM_EVENT_ALREADY_EXISTS;
+    }
+    If(pqChangePriority(em, event_to_change, new_date, event_to_change->event_date) == PQ_OUT_OF_MEMORY)
+    {
+        destroyEventManager(em);
+        return EM_OUT_OF_MEMORY;
+    }
+    return EM_SUCCESS;
 }
 
 EventManagerResult emAddMember(EventManager em, char* member_name, int member_id)
