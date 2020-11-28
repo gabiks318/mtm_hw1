@@ -11,13 +11,12 @@ typedef struct Node_t* Node;
 
 
 typedef struct event{
-    Date event_date;
     int event_id;
     char* event_name;
     Node members_list_event;
 } *Event;
 
-static Event eventCreate(char* event_name, int event_id, Date date);
+static Event eventCreate(char* event_name, int event_id);
 static void eventDestroy(Event event);
 static Event eventCopy(Event event);
 static bool eventEqual(Event event_1, Event event_2);
@@ -28,7 +27,7 @@ static bool eventExists(Date date, char* event_name); //need to write!
 static Event findEventByID(int event_id);//need to write!
 
 
-static Event eventCreate(char* event_name, int event_id, Date date)
+static Event eventCreate(char* event_name, int event_id)
 {
     if(event_name == NULL)
     {
@@ -38,7 +37,6 @@ static Event eventCreate(char* event_name, int event_id, Date date)
     {
         return EM_INVALID_EVENT_ID;
     }
-    // I think we neeed to also check if date is valid
     Event event = malloc(sizeof(*event));
     if(event == NULL){
         return EM_OUT_OF_MEMORY;
@@ -46,7 +44,6 @@ static Event eventCreate(char* event_name, int event_id, Date date)
     
     event->event_id = event_id;
     event->event_name = event_name;
-    event->event_date = dateCopy(date);
     event->members_list_event = NULL;
 
     return event;
@@ -74,7 +71,7 @@ static Event eventCopy(Event event){
     if(event == NULL){
         return NULL;
     }
-    Event event_copy = eventCreate(event->event_name, event->event_id, event->event_date);
+    Event event_copy = eventCreate(event->event_name, event->event_id);
     event_copy->members_list_event = event->members_list_event;
 }
 
@@ -245,7 +242,7 @@ EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_dat
     {
         return EM_EVENT_ALREADY_EXISTS;
     }
-    If(pqChangePriority(em, event_to_change, new_date, event_to_change->event_date) == PQ_OUT_OF_MEMORY)
+    If(pqChangePriority(em, event_to_change, new_date, dateofevent_id ) == PQ_OUT_OF_MEMORY)//should think how to access the current date of event_id, maybe we should use the iterator?
     {
         destroyEventManager(em);
         return EM_OUT_OF_MEMORY;
