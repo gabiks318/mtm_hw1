@@ -71,11 +71,13 @@ void nodeDestroyAll(Node node){
 NodeResult nodeAddNext(Node node, Member member){
     printDebug("Adding Node");
     
-    if(node == NULL || member == NULL){
+    if(member == NULL){
+        printDebug("nodeAddNext NULL argument");
         return NODE_NULL_ARGUMENT;
     }
     
     if(nodeMemberExists(node ,member)){
+        printDebug("nodeAddNext exist");
         return NODE_MEMBER_ALREADY_EXISTS;
     }
 

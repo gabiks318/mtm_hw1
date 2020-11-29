@@ -54,8 +54,11 @@ bool testEventAddRemoveMember(){
     printf("2\n");
     Member tested_member = nodeGetMember(member_list);
     printf("3\n");
+    ASSERT_TEST(memberGetId(member)== 12345, returnEventAddRemoveMember);
+    ASSERT_TEST(memberGetId(tested_member)== 12345, returnEventAddRemoveMember);
+
     ASSERT_TEST(memberEqual(tested_member, member),returnEventAddRemoveMember);
-    
+
     eventRemoveMember(event, member);
     ASSERT_TEST(nodeGetMember(member_list) == NULL, returnEventAddRemoveMember);
     

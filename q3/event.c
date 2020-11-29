@@ -139,6 +139,16 @@ EventResult eventAddMember(Event event, Member member)
     {
         return EVENT_NULL_ARGUMENT;
     }
+    if(event->event_members_list == NULL)// here I fixed if we are adding the first member so do this, we might want to move it to nodeAddNext
+    {
+        event->event_members_list = nodeCreate(member);
+        if(event->event_members_list == NULL)
+        {
+            return EVENT_OUT_OF_MEMORY;
+        }
+        return EVENT_SUCCESS;
+
+    }
     if(nodeAddNext(event->event_members_list, member) == NODE_OUT_OF_MEMORY)
     {
         return EVENT_OUT_OF_MEMORY;
