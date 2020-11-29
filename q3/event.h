@@ -42,7 +42,7 @@ bool eventEqual(Event event_1, Event event_2);
 
 /*getEventDate- return the date of the event that sent */
 
-Date eventGEtDate(Event event);
+Date eventGetDate(Event event);
 
 /*getEventName- return the name of the event that sent */
 
@@ -65,6 +65,8 @@ EventResult eventAddMember(Event event, Member member);
 
 /*eventRemoveMember - removing a member from the event*/
 
-void eventRemoveMember(Event event, Member member);
+Node eventGetMemberList(Event event);
+
+EventResult eventRemoveMember(Event event, Member member);
                       
 #endif

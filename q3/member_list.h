@@ -27,15 +27,14 @@ Copies node and all the nodes connected to it
 returns NULL in case of memory error, or node is NULL
 */
 Node nodeCopyAll(Node node);
-Node nodeFindById(Node node, int member_id);
+Member nodeFindMemberById(Node node, int member_id);
 bool nodeMemberExists(Node node, Member member);
 void nodeMemberRemove(Node node, Member member);
-void nodeMemberRemoveById(Node node, int member_id);
 Member nodeGetMember(Node node);
 
 #define NODE_FOREACH(element, iterator)\
     for(Node iterator = element; \
     iterator != NULL;\
-    iterator = nodeGetNext(element)\
+    iterator = nodeGetNext(iterator)\
     )
 #endif

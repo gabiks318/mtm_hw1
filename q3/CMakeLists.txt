@@ -9,4 +9,4 @@ set(CMAKE_C_FLAGS ${MTM_FLAGS_DEBUG})
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/tests")
 
-add_executable(my_executable tests/member_list_tests.c member_list.c member.c)
+add_executable(my_executable tests/event_tests.c event.c date.c member_list.c member.c)

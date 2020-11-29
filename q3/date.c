@@ -57,6 +57,10 @@ Date dateCopy(Date date)
         return NULL;
     }
     Date copy_date = dateCreate(date->day, date->month, date->year);
+    if(copy_date == NULL)
+    {
+        return NULL;
+    }
     return copy_date;
 }
 bool dateGet(Date date, int* day, int* month, int* year)

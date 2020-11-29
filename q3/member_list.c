@@ -5,7 +5,7 @@
 
 #include "member_list.h"
 
-#define DEBUG false
+#define DEBUG true
 
 struct Node_t{
     Member member;
@@ -34,6 +34,7 @@ Node nodeCreate(Member member)
     printDebug("copying member");
     Member copy_member = memberCopy(member);
     if(copy_member == NULL){
+        free(node);
         return NULL;
     }
     printDebug("member copied");
@@ -168,8 +169,61 @@ bool nodeMemberExists(Node node, Member member){
 Member nodeGetMember(Node node){
     if(node == NULL)
     {
+        printDebug("node is Null");
         return NULL;
     }
     return node->member;
 }
 
+Member nodeFindMemberById(Node node, int member_id){
+    if(node == NULL){
+        return NULL;
+    }
+
+    Member current_member = nodeGetMember(node);
+    Node current_node = node;
+    while(current_node != NULL){
+        if(memberGetId(current_member) == member_id){
+            return current_member;
+        }
+        current_node = current_node->next;
+        if(current_node != NULL){
+            current_member = nodeGetMember(current_node);
+        }
+    }
+
+    return NULL;
+}
+
+void nodeMemberRemove(Node node, Member member){
+    // If first node removed, derefrence node and make it's value the second node
+    if(node == NULL || member == NULL){
+        return;
+    }
+
+    Node current_node = node;
+    Node temp_node = NULL;
+    Member current_member = current_node->member;
+    while(current_node != NULL){
+        if(memberEqual(current_member, member)){
+            if(temp_node == NULL){
+                if(current_node->next == NULL){
+                    node = NULL;
+                } else {
+                    *node = *current_node->next;
+                }
+                nodeDestroy(current_node);
+                return;
+            }
+
+            temp_node->next = current_node->next;
+            nodeDestroy(current_node);
+            return;
+        }
+        temp_node = current_node;
+        current_node = current_node->next;
+        if(current_node != NULL){
+            current_member = nodeGetMember(current_node);
+        }
+    }
+}

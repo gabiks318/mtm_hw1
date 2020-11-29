@@ -8,112 +8,69 @@
 #include "member.h"
 #include "event.h"
 
-
-
-typedef struct event{
-    int event_id;
-    char* event_name;
-    Node event_members_list;
-    Date date;
-} *Event;
-
-static bool eventExists(Date date, char* event_name); //need to write!
-static Event findEventByID(int event_id);//need to write!
-
-static Node getEventMemberList(Event event);
-static bool eventCheckMemberExist(int member_id);//need to write?
-static int eventAddMember(Member member);//need to write?
-static bool eventExists(Date date, char* event_name); //need to write!
-static Event findEventByID(int event_id);//need to write!
-
-
-static Event eventCreate(char* event_name, int event_id)
-{
-    if(event_name == NULL)
-    {
-        return EM_NULL_ARGUMENT;
-    }
-    if(event_id < 0)
-    {
-        return EM_INVALID_EVENT_ID;
-    }
-    Event event = malloc(sizeof(*event));
-    if(event == NULL)
-    {
-        return EM_OUT_OF_MEMORY;
-    }
-    
-    event->event_id = event_id;
-    event->event_name = event_name;
-    event->members_list_event = NULL;
-
-    return event;
-}
-
-static void eventDestroy(Event event)
-{
-    if(event == NULL){
-        return;
-    }
-
-    Node node_to_destroy = event->members_list_event;
-    Node temp = NULL;
-    while(nodeGetNext(node_to_destroy) != NULL)
-    {
-        temp = nodeGetNext(node_to_destroy);
-        free(node_to_destroy);
-        node_to_destroy = temp;
-    }
-    free(node_to_destroy);
-    
-    free(event);
-}
-
-static Event eventCopy(Event event){
-    if(event == NULL)
-    {
-        return NULL;
-    }
-    Event event_copy = eventCreate(event->event_name, event->event_id);
-    event_copy->members_list_event = event->members_list_event;
-}
-
-static bool eventEqual(Event event_1, Event event_2)
-{
-    return event_1->event_id == event_2->event_id;
-}
-
+static bool eventManagerEventExists(EventManager em, Date date, char* event_name); 
+static Event eventManagerfindEventByID(EventManager em, int event_id);//need to write!
 
 struct EventManager_t{
-    Date date_created;
-    PriorityQueue event_list;
-    Node member_list;
+    Date event_manager_date_created;
+    PriorityQueue event_manager_event_list;
+    Node event_manager_member_list;
 }
 
+static bool eventManagerEventExists(EventManager em, Date date, char* event_name)
+{
+    PQ_FOREACH(Event, iterator, em->event_manager_event_list)
+    {
+        if(iterator != NULL){
+            if(dateCompare(eventGetDate(iterator), date) == 0 && strcmp(event_name,eventGetName(iterator)) == 0)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+    
+}
 
 EventManager createEventManager(Date date)
 {
+    if(date == NULL)
+    {
+        return NULL;
+    }
     EventManager event_manager = malloc(sizeof(*event_manager));
     if(event_manager == NULL)
     {
-
+        return NULL;
     }
-    event_manager->date_created = date;
+
+    event_manager->event_manager_date_created = copyDate(date);
+    if(event_manager->event_manager_date_created == NULL)
+    {
+        free(event_manager);
+        return NULL;
+    }
 
     PriorityQueue priority_queue = pqCreate(eventCopy, eventDestroy, eventEqual, dateCopy, dateDestroy, dateCompare);
     if(priority_queue == NULL)
     {
+        dateDestroy(event_manager->event_manager_date_created);
+        free(event_manager);
         return NULL;
     }
+    event_manager->event_manager_event_list = priority_queue;
+
+    event_manager->event_manager_member_list = NULL;
+
     return event_manager;   
 }
 
 void destroyEventManager(EventManager em)
 {
-    pqDestroy(em->event_list);
-    nodeDestroy(em->member_list);
+    dateDestroy(em->event_manager_date_created);
+    pqDestroy(em->event_manager_event_list);
+    nodeDestroyAll(em->event_manager_member_list);
     free(em);
-    
 }
 
 EventManagerResult emAddEventByDate(EventManager em, char* event_name, Date date, int event_id)
@@ -122,7 +79,7 @@ EventManagerResult emAddEventByDate(EventManager em, char* event_name, Date date
     {
         return EM_NULL_ARGUMENT;
     }
-    if(dateCompare(date, em->date_created) >= 0)
+    if(dateCompare(date, em->event_manager_date_created) > 0) // TODO: need to ask if >= or >
     {
         return EM_INVALID_DATE;
     }
@@ -130,14 +87,14 @@ EventManagerResult emAddEventByDate(EventManager em, char* event_name, Date date
     {
         return EM_INVALID_EVENT_ID;
     }
-    if(eventExists(date, event_name))
+    
+    if(!eventManagerEventExists(em, date, event_name))
     {
         return EM_EVENT_ALREADY_EXISTS;
     }
   
     Event event_to_add = eventCreate(event_name, event_id, date);
-
-    if(event_to_add == EM_OUT_OF_MEMORY)
+    if(event_to_add == NULL)
     {
         destroyEventManager(em);
         return EM_OUT_OF_MEMORY;
@@ -147,7 +104,7 @@ EventManagerResult emAddEventByDate(EventManager em, char* event_name, Date date
         eventDestroy(event_to_add);
         return EM_EVENT_ID_ALREADY_EXISTS;
     }
-    if(pqInsert(em, event_to_add, eventGetDate(event_to_add)) == PQ_OUT_OF_MEMORY)
+    if(pqInsert(em, event_to_add, date) == PQ_OUT_OF_MEMORY)
     {
         destroyEventManager(em);
         return EM_OUT_OF_MEMORY;
@@ -155,30 +112,7 @@ EventManagerResult emAddEventByDate(EventManager em, char* event_name, Date date
     return EM_SUCCESS;
 
 }
-inline EventManagerResult checkResult(EventManagerResult result)
-{
-    if(result == EM_INVALID_DATE)
-    {
-        return EM_INVALID_DATE;
-    }
-    if(result == EM_INVALID_EVENT_ID)
-    {
-        return EM_INVALID_EVENT_ID;
-    }
-    if(result == EM_EVENT_ALREADY_EXISTS)
-    {
-        return EM_EVENT_ALREADY_EXISTS;
-    }
-    if(result == EM_EVENT_ID_ALREADY_EXISTS)
-    {
-        return EM_EVENT_ID_ALREADY_EXISTS;
-    }
-    if(result == EM_OUT_OF_MEMORY)
-    {
-        return EM_OUT_OF_MEMORY;
-    }
-    return EM_SUCCESS;
-}
+
 EventManagerResult emAddEventByDiff(EventManager em, char* event_name, int days, int event_id)
 {
     if(em == NULL || event_name == NULL || days == NULL || event_id == NULL)
@@ -196,7 +130,7 @@ EventManagerResult emAddEventByDiff(EventManager em, char* event_name, int days,
         dateTick(date);
     }
     EventManagerResult result = emAddEventByDate(em, event_name, date, event_id);
-    return checkResult(result);
+    return result;
 }
 
 

@@ -4,7 +4,7 @@
 #include "test_utilities.h"
 #include "../member_list.h"
 
-#define NUMBER_TESTS 5
+#define NUMBER_TESTS 8
 
 bool testMemberListCreateDestroy(){
     bool result = true;
@@ -15,7 +15,7 @@ bool testMemberListCreateDestroy(){
     ASSERT_TEST(member_1 != NULL,returnMemberCreateDestroy);
     Node node = nodeCreate(member_1);
     ASSERT_TEST(node != NULL, destroyMemberListCreateDestroy);
-    ASSERT_TEST(nodeGetMember(node) == member_1, destroyMemberListCreateDestroy);
+    ASSERT_TEST(memberEqual(nodeGetMember(node), member_1), destroyMemberListCreateDestroy);
     ASSERT_TEST(nodeGetNext(node) == NULL, destroyMemberListCreateDestroy);
     ASSERT_TEST(member_1 != NULL, destroyMemberListCreateDestroy);
 
@@ -108,13 +108,13 @@ bool testMemberListCopy(){
     nodeAddNext(node, member_3);
     Node copy_node = nodeCopyAll(node);
     ASSERT_TEST(copy_node != NULL, returnMemberListCopy);
-    ASSERT_TEST(nodeGetMember(copy_node) == member_1 , returnMemberListCopy);
+    ASSERT_TEST(memberEqual(nodeGetMember(copy_node),member_1) , returnMemberListCopy);
     Node copy_node_2 = nodeGetNext(copy_node);
     ASSERT_TEST(copy_node_2 != NULL, returnMemberListCopy);
-    ASSERT_TEST(nodeGetMember(copy_node_2) == member_2 , returnMemberListCopy);
+    ASSERT_TEST(memberEqual(nodeGetMember(copy_node_2),member_2)  , returnMemberListCopy);
     Node copy_node_3 = nodeGetNext(copy_node_2);
     ASSERT_TEST(copy_node_3 != NULL, returnMemberListCopy);
-    ASSERT_TEST(nodeGetMember(copy_node_3) == member_3 , returnMemberListCopy);
+    ASSERT_TEST(memberEqual(nodeGetMember(copy_node_3),member_3)  , returnMemberListCopy);
 
     returnMemberListCopy:
         nodeDestroyAll(node);
@@ -175,7 +175,7 @@ bool testMemberListIterator(){
     NODE_FOREACH(node, iter){
         if(i != max_iteration){
             ASSERT_TEST(iter != NULL, returnMemberListIterator);
-        } else {
+        } else {            
             ASSERT_TEST(iter == NULL, returnMemberListIterator);
         }
         i++;
@@ -183,6 +183,73 @@ bool testMemberListIterator(){
 
     returnMemberListIterator:
         nodeDestroyAll(node);
+        memberDestroy(member_1);
+        memberDestroy(member_2);
+        memberDestroy(member_3);
+        memberDestroy(member_4);
+        return result;
+}
+
+bool testMemberListFindById(){
+    bool result = true;
+    int member_id = 1;
+    char* member_name_1 = "gabi";
+    char* member_name_2 = "yan";
+    char* member_name_3 = "borat";
+    char* member_name_4 = "maradona";
+    Member member_1 = memberCreate(member_id, member_name_1);
+    Member member_2 = memberCreate(member_id + 1, member_name_2);
+    Member member_3 = memberCreate(member_id + 2, member_name_3);
+    Member member_4 = memberCreate(member_id + 3, member_name_4);
+    Node node = nodeCreate(member_1);
+    nodeAddNext(node, member_2);
+    nodeAddNext(node, member_3);
+    nodeAddNext(node, member_4);
+
+    Member found = nodeFindMemberById(node, 2);
+    ASSERT_TEST(memberEqual(found, member_2),returnMemberListFindById);
+    found = nodeFindMemberById(node, 7);
+    ASSERT_TEST(found == NULL,returnMemberListFindById);
+
+    returnMemberListFindById:
+        nodeDestroyAll(node);
+        memberDestroy(member_1);
+        memberDestroy(member_2);
+        memberDestroy(member_3);
+        memberDestroy(member_4);
+        return result;
+
+}
+
+bool testNodeRemoveMember(){
+    bool result = true;
+    int member_id = 1;
+    char* member_name_1 = "gabi";
+    char* member_name_2 = "yan";
+    char* member_name_3 = "borat";
+    char* member_name_4 = "maradona";
+    Member member_1 = memberCreate(member_id, member_name_1);
+    Member member_2 = memberCreate(member_id + 1, member_name_2);
+    Member member_3 = memberCreate(member_id + 2, member_name_3);
+    Member member_4 = memberCreate(member_id + 3, member_name_4);
+    Node node = nodeCreate(member_1);
+    nodeAddNext(node, member_2);
+    nodeAddNext(node, member_3);
+    nodeAddNext(node, member_4);
+
+    nodeMemberRemove(node, member_2);
+    Node node_2 = nodeGetNext(node);
+    ASSERT_TEST(!memberEqual(nodeGetMember(node_2), member_2), returnMemberListFindById);
+    nodeMemberRemove(node, member_1);
+    ASSERT_TEST(node != NULL, returnMemberListFindById);
+    ASSERT_TEST(!memberEqual(nodeGetMember(node), member_1), returnMemberListFindById);
+
+    returnMemberListFindById:
+        nodeDestroyAll(node);
+        memberDestroy(member_1);
+        memberDestroy(member_2);
+        memberDestroy(member_3);
+        memberDestroy(member_4);
         return result;
 }
 
@@ -192,7 +259,9 @@ bool (*tests[])(void) = {
     testMemberListCopy,
     testMemberListDestroyAll,
     testMemberListMemberExists,
-    testMemberListIterator
+    testMemberListIterator,
+    testMemberListFindById,
+    testNodeRemoveMember
 };
 
 const char* testNames[] = {
@@ -201,7 +270,9 @@ const char* testNames[] = {
     "testMemberListCopy",
     "testMemberListDestroyAll",
     "testMemberListMemberExists",
-    "testMemberListIterator"
+    "testMemberListIterator",
+    "testMemberListFindById",
+    "testNodeRemoveMember"
 };
 
 int main(int argc, char *argv[]) {
