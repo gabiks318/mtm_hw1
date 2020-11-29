@@ -1,34 +1,35 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "test_utilities.h"
 #include "../member.h"
 
 #define NUMBER_TESTS 1
 
-bool testMemberCreateDestroy(){
+bool testMemberCopyDestroy(){
     bool result = true;
     int member_id = 1;
     char* member_name = "gabi";
 
     Member member_1 = memberCreate(member_id, member_name);
-    ASSERT_TEST(member_1 != NULL,returnMemberCreateDestroy);
-    ASSERT_TEST(memberGetId(member_1)  == member_id ,destroyMemberCreateDestroy);
-    ASSERT_TEST(strcmp(memberGetName(member_1) ,member_name) == 0, destroyMemberCreateDestroy);
+    Member member_2 = memberCopy(member_1);
+    ASSERT_TEST(memberGetId(member_1) == memberGetId(member_2),destroyMemberCreateDestroy);
+    ASSERT_TEST(strcmp(memberGetName(member_1),memberGetName(member_2)) == 0 ,destroyMemberCreateDestroy);
 
     destroyMemberCreateDestroy:
         memberDestroy(member_1);
-    returnMemberCreateDestroy:
+        memberDestroy(member_2);
         return result;
 }
 
 bool (*tests[])(void) = {
-    testMemberCreateDestroy
+    testMemberCopyDestroy
 };
 
 const char* testNames[] = {
-    "testMemberCreateDestroy"
+    "testMemberCopyDestroy"
 };
 
 int main(int argc, char *argv[]) {

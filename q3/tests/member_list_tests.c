@@ -4,7 +4,7 @@
 #include "test_utilities.h"
 #include "../member_list.h"
 
-#define NUMBER_TESTS 4
+#define NUMBER_TESTS 5
 
 bool testMemberListCreateDestroy(){
     bool result = true;
@@ -32,17 +32,20 @@ bool testMemberListAddGetNext(){
     char* member_name = "gabi";
 
     Member member_1 = memberCreate(member_id, member_name);
+    Member member_2 = memberCreate(member_id + 1, member_name);
+    Member member_3 = memberCreate(member_id + 2, member_name);
     ASSERT_TEST(member_1 != NULL,returnMemberAddGetNext);
     Node node_1 = nodeCreate(member_1);
     ASSERT_TEST(node_1 != NULL, destroyMemberListAddGetNext);
-    nodeAddNext(node_1, member_1);
+    nodeAddNext(node_1, member_2);
     Node node_2 = nodeGetNext(node_1);
     ASSERT_TEST(node_2 != NULL, destroyMemberListAddGetNext2);
     ASSERT_TEST(node_2 != node_1, destroyMemberListAddGetNext2);
-    nodeAddNext(node_1, member_1);
+    nodeAddNext(node_1, member_3);
     Node node_3 = nodeGetNext(node_2);
     ASSERT_TEST(node_3 != NULL, destroyMemberListAddGetNext3);
     ASSERT_TEST(node_2 != node_3, destroyMemberListAddGetNext3);
+    ASSERT_TEST(nodeAddNext(node_1, member_1) == NODE_MEMBER_ALREADY_EXISTS, destroyMemberListAddGetNext3);
 
     destroyMemberListAddGetNext3:
         nodeDestroy(node_3);
@@ -51,6 +54,8 @@ bool testMemberListAddGetNext(){
     destroyMemberListAddGetNext:
         nodeDestroy(node_1);
         memberDestroy(member_1);
+        memberDestroy(member_2);
+        memberDestroy(member_3);
     returnMemberAddGetNext:
         return result;
 }
@@ -61,17 +66,20 @@ bool testMemberListDestroyAll(){
     char* member_name = "gabi";
 
     Member member_1 = memberCreate(member_id, member_name);
+    Member member_2 = memberCreate(member_id + 1, member_name);
+    Member member_3 = memberCreate(member_id + 2, member_name);
     ASSERT_TEST(member_1 != NULL,returnMemberListDestroyAll);
     Node node_1 = nodeCreate(member_1);
     ASSERT_TEST(node_1 != NULL, destroyMemberListDestroyAll);
-    nodeAddNext(node_1, member_1);
+    nodeAddNext(node_1, member_2);
     Node node_2 = nodeGetNext(node_1);
     ASSERT_TEST(node_2 != NULL, destroyMemberListDestroyAll2);
-    nodeAddNext(node_1, member_1);
+    nodeAddNext(node_1, member_3);
     Node node_3 = nodeGetNext(node_2);
     ASSERT_TEST(node_3 != NULL, destroyMemberListDestroyAll3);
     nodeDestroyAll(node_1);
     
+    return result;
     destroyMemberListDestroyAll3:
         nodeDestroy(node_3);
     destroyMemberListDestroyAll2:
@@ -80,6 +88,8 @@ bool testMemberListDestroyAll(){
         nodeDestroy(node_1);        
     returnMemberListDestroyAll:
         memberDestroy(member_1);
+        memberDestroy(member_2);
+        memberDestroy(member_3);
         return result;
 }
 
@@ -115,18 +125,83 @@ bool testMemberListCopy(){
         return result;
 }
 
+bool testMemberListMemberExists(){
+    bool result = true;
+    int member_id = 1;
+    char* member_name_1 = "gabi";
+    char* member_name_2 = "yan";
+    char* member_name_3 = "borat";
+    char* member_name_4 = "maradona";
+    Member member_1 = memberCreate(member_id, member_name_1);
+    Member member_2 = memberCreate(member_id + 1, member_name_2);
+    Member member_3 = memberCreate(member_id + 2, member_name_3);
+    Member member_4 = memberCreate(member_id + 3, member_name_4);
+    Node node = nodeCreate(member_1);
+    nodeAddNext(node, member_2);
+    nodeAddNext(node, member_3);
+
+    ASSERT_TEST(nodeMemberExists(node, member_1) == true, returnMemberListMemberExists);
+    ASSERT_TEST(nodeMemberExists(node, member_2) == true, returnMemberListMemberExists);
+    ASSERT_TEST(nodeMemberExists(node, member_3) == true, returnMemberListMemberExists);
+    ASSERT_TEST(nodeMemberExists(node, member_4) == false, returnMemberListMemberExists);
+
+    returnMemberListMemberExists:
+        nodeDestroyAll(node);
+        memberDestroy(member_1);
+        memberDestroy(member_2);
+        memberDestroy(member_3);
+        memberDestroy(member_4);
+        return result;
+}
+
+bool testMemberListIterator(){
+    bool result = true;
+    int member_id = 1;
+    char* member_name_1 = "gabi";
+    char* member_name_2 = "yan";
+    char* member_name_3 = "borat";
+    char* member_name_4 = "maradona";
+    Member member_1 = memberCreate(member_id, member_name_1);
+    Member member_2 = memberCreate(member_id + 1, member_name_2);
+    Member member_3 = memberCreate(member_id + 2, member_name_3);
+    Member member_4 = memberCreate(member_id + 3, member_name_4);
+    Node node = nodeCreate(member_1);
+    nodeAddNext(node, member_2);
+    nodeAddNext(node, member_3);
+    nodeAddNext(node, member_4);
+
+    int max_iteration = 4;
+    int i = 0;
+    NODE_FOREACH(node, iter){
+        if(i != max_iteration){
+            ASSERT_TEST(iter != NULL, returnMemberListIterator);
+        } else {
+            ASSERT_TEST(iter == NULL, returnMemberListIterator);
+        }
+        i++;
+    }
+
+    returnMemberListIterator:
+        nodeDestroyAll(node);
+        return result;
+}
+
 bool (*tests[])(void) = {
     testMemberListCreateDestroy,
     testMemberListAddGetNext,
+    testMemberListCopy,
     testMemberListDestroyAll,
-    testMemberListCopy
+    testMemberListMemberExists,
+    testMemberListIterator
 };
 
 const char* testNames[] = {
     "testMemberListCreateDestroy",
     "testMemberListAddGetNext",
+    "testMemberListCopy",
     "testMemberListDestroyAll",
-    "testMemberListCopy"
+    "testMemberListMemberExists",
+    "testMemberListIterator"
 };
 
 int main(int argc, char *argv[]) {

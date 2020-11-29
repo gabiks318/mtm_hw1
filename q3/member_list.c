@@ -1,18 +1,19 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "member_list.h"
 
-#define PRINT false
+#define DEBUG false
 
 struct Node_t{
     Member member;
     Node next;
 };
 
-void memberListPrintDebug(char* text){
-    if(PRINT){
+static void printDebug(char* text){
+    if(DEBUG){
         printf(text);
         printf("\n");
     }
@@ -20,6 +21,7 @@ void memberListPrintDebug(char* text){
 
 Node nodeCreate(Member member)
 {
+    printDebug("Creating node");
     if(member == NULL) 
     {
         return NULL;
@@ -29,47 +31,58 @@ Node nodeCreate(Member member)
     {
         return NULL;
     }
-    node->member = member;
+    printDebug("copying member");
+    Member copy_member = memberCopy(member);
+    if(copy_member == NULL){
+        return NULL;
+    }
+    printDebug("member copied");
+    node->member = copy_member;
     node->next = NULL;
+    printDebug("Node created");
     return node;
 }
 
 void nodeDestroy(Node node)
 {
-    // Doesn't free the member inside, should be done seperately
+    printDebug("Destroying node");
+    memberDestroy(node->member);
     free(node);
 }
 
 void nodeDestroyAll(Node node){
-    memberListPrintDebug("Destroying all");
+    printDebug("Destroying all");
     if(node == NULL){
         return;
     }
     Node temp = node->next;
     while(node != NULL){
-        memberListPrintDebug("Destroying node");
+        printDebug("Destroying node");
         nodeDestroy(node);
         node = temp;
         if(temp != NULL){
             temp = node->next;
         }
     }
-    memberListPrintDebug("All nodes Destroyed");
+    printDebug("All nodes Destroyed");
 }
 
 NodeResult nodeAddNext(Node node, Member member){
-    memberListPrintDebug("Adding Node");
+    printDebug("Adding Node");
     
     if(node == NULL || member == NULL){
         return NODE_NULL_ARGUMENT;
     }
     
-    memberListPrintDebug("vars Checked");
+    if(nodeMemberExists(node ,member)){
+        return NODE_MEMBER_ALREADY_EXISTS;
+    }
+
     Node new_node = nodeCreate(member);
     if(new_node == NULL){
         return NODE_OUT_OF_MEMORY;
     }
-    memberListPrintDebug("new node created");
+    printDebug("new node created");
     Node temp = node->next;
     Node current_node = node;
     while (temp != NULL)
@@ -80,7 +93,7 @@ NodeResult nodeAddNext(Node node, Member member){
     
     current_node->next = new_node;
 
-    memberListPrintDebug("Node added");
+    printDebug("Node added");
     
     return NODE_SUCCESS;
 }
@@ -104,21 +117,23 @@ Node nodeCopy(Node node){
 
 Node nodeCopyAll(Node node)
 {
-    memberListPrintDebug("Copying all");
-    if(node == NULL){
+    printDebug("Copying all");
+    if(node == NULL)
+    {
         return NULL;
     }
 
     Node first_node = nodeCreate(node->member);
-    memberListPrintDebug("First node copied");
-    if(first_node == NULL){
+    printDebug("First node copied");
+    if(first_node == NULL)
+    {
         return NULL;
     }
     Node current_node = first_node;
     Node next_node = node->next;
     NodeResult result;
     while(next_node != NULL){
-        memberListPrintDebug("Copying node");
+        printDebug("Copying node");
         result = nodeAddNext(current_node, next_node->member);
         if(result == NODE_SUCCESS){
             current_node = current_node->next;
@@ -128,11 +143,31 @@ Node nodeCopyAll(Node node)
             return NULL;
         }
     }
-    memberListPrintDebug("All copied");
+    printDebug("All copied");
     return first_node;
 }
+
+bool nodeMemberExists(Node node, Member member){
+    if(node == NULL || member == NULL)
+    {
+        return false;
+    }
+    Node temp = node;
+    while(temp != NULL)
+    {
+        if(memberEqual(temp->member, member))
+        {
+            return true;
+        }
+        temp = temp->next;
+    }
+
+    return false;
+}
+
 Member nodeGetMember(Node node){
-    if(node == NULL){
+    if(node == NULL)
+    {
         return NULL;
     }
     return node->member;
