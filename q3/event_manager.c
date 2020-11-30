@@ -114,7 +114,9 @@ EventManager createEventManager(Date date)
         return NULL;
     }
 
-    PriorityQueue priority_queue = pqCreate((Event)(*eventCopy)(Event), (void)(*eventDestroy)(Event), (bool)(*eventEqual)(Event,Event), (Date)(*dateCopy)(Date), (void)(*dateDestroy)(Date), (int)(*dateCompare)(Date,Date));
+   // PriorityQueue priority_queue = pqCreate((Event)(eventCopy)(Event), (void)(eventDestroy)(Event), (bool)(eventEqual)(Event,Event), (Date)(dateCopy)(Date), (void)(*dateDestroy)(Date), (int)(dateCompare)(Date,Date));
+    PriorityQueue priority_queue = pqCreate((eventCopy), (eventDestroy), (eventEqual), (dateCopy), (dateDestroy), (dateCompare) );
+
     if(priority_queue == NULL)
     {
         dateDestroy(event_manager->event_manager_date_created);
@@ -225,12 +227,8 @@ EventManagerResult emRemoveEvent(EventManager em, int event_id)
     {
         return EM_EVENT_NOT_EXISTS;
     }
-    PriorityQueueResult result = pqRemoveElement(em->event_manager_event_list, event_to_remove);
-    if(result == PQ_SUCCESS)
-    {
-        return EM_SUCCESS;
-    }
-
+    pqRemoveElement(em->event_manager_event_list, event_to_remove);
+    return EM_SUCCESS;
 }
 
 EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_date)
@@ -507,15 +505,17 @@ static void maxSortTwoArrays(int* arr1, int* arr2, int size)
 
 static int findIndexofMax(int* arr, int size)
 {
-    int max = arr[0], current_max;
+    int max = arr[0], current_max, index_of_max = 0;
     for(int i = 1; i < size; i++)
     {
         current_max = arr[i];
         if(current_max > max)
         {
             max = current_max;
+            index_of_max = i;
         }
     }
+    return index_of_max;
 }
 static void swap(int *p, int *q)
 {
