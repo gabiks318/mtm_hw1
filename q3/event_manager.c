@@ -10,7 +10,15 @@
 #include "member.h"
 #include "event.h"
 
+#define DEBUG true
 #define EQUAL 0
+
+static void debugPrint(char* text){
+    if(DEBUG){
+        printf(text);
+        printf("\n");
+    }
+}
 
 static void swap(int *p, int *q);
 static int findIndexofMax(int* arr, int size);
@@ -176,24 +184,29 @@ void destroyEventManager(EventManager em)
 
 EventManagerResult emAddEventByDate(EventManager em, char* event_name, Date date, int event_id)
 {
+    debugPrint("adding event");
     if(em == NULL || event_name == NULL || date == NULL)
     {
+        
         return EM_NULL_ARGUMENT;
     }
     if(dateCompare(date, em->event_manager_date_created) < 0) // TODO: need to ask if >= or >
     {
+        
         return EM_INVALID_DATE;
     }
     if(event_id < 0)
     {
+        
         return EM_INVALID_EVENT_ID;
     }
     
-    if(!eventManagerEventExists(em, date, event_name))
+    if(eventManagerEventExists(em, date, event_name))
     {
         return EM_EVENT_ALREADY_EXISTS;
     }
-  
+    
+    debugPrint("adding event checks passed");
     Event event_to_add = eventCreate(event_name, event_id, date);
     if(event_to_add == NULL)
     {
@@ -205,6 +218,7 @@ EventManagerResult emAddEventByDate(EventManager em, char* event_name, Date date
         eventDestroy(event_to_add);
         return EM_EVENT_ID_ALREADY_EXISTS;
     }
+    debugPrint("adding event adding event");
     if(pqInsert(em->event_manager_event_list, event_to_add, date) == PQ_OUT_OF_MEMORY)
     {
         eventDestroy(event_to_add);
@@ -212,12 +226,14 @@ EventManagerResult emAddEventByDate(EventManager em, char* event_name, Date date
         return EM_OUT_OF_MEMORY;
     }
     eventDestroy(event_to_add);
+    debugPrint("adding event succeded");
     return EM_SUCCESS;
 
 }
 
 EventManagerResult emAddEventByDiff(EventManager em, char* event_name, int days, int event_id)
 {
+    debugPrint("adding event by diff");
     if(em == NULL || event_name == NULL)
     {
         return EM_NULL_ARGUMENT;
@@ -232,18 +248,21 @@ EventManagerResult emAddEventByDiff(EventManager em, char* event_name, int days,
         return EM_INVALID_DATE;
     }
 
+    debugPrint("adding event by diff checks passed");
     Date date = dateCopy(em->event_manager_date_created);
     if(date == NULL)
     {
         destroyEventManager(em);
         return EM_OUT_OF_MEMORY;
     }
+    debugPrint("date copied");
     for(int i = 0; i < days; i++)
     {
         dateTick(date);
     }
     EventManagerResult result = emAddEventByDate(em, event_name, date, event_id);
     dateDestroy(date);
+    debugPrint("adding event by diff finished");
     return result;
 }
 

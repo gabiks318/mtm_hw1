@@ -3,7 +3,7 @@
 #include "./priority_queue.h"
 
 
-#define NUMBER_TESTS 4
+#define NUMBER_TESTS 1
 
 static PQElementPriority copyIntGeneric(PQElementPriority n) {
     if (!n) {
@@ -100,10 +100,10 @@ destroyPQIterator:
 }
 
 bool (*tests[]) (void) = {
-        testPQCreateDestroy,
-        testPQInsertAndSize,
-        testPQGetFirst,
-        testPQIterator
+        /* testPQCreateDestroy, */
+        /* testPQInsertAndSize, */
+        /* testPQGetFirst, */
+        /* testPQIterator */
 };
 
 const char* testNames[] = {

@@ -2,8 +2,9 @@
 #include "../event_manager.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
-#define NUMBER_TESTS 3
+#define NUMBER_TESTS 1
 
 bool testEventManagerCreateDestroy() {
     bool result = true;
@@ -46,10 +47,10 @@ bool result = true;
 
     char* event_name = "event1";
     ASSERT_TEST(emAddEventByDiff(em, event_name, 1, 1) == EM_SUCCESS, destroyEMTick);
-
     ASSERT_TEST(emGetEventsAmount(em) == 1, destroyEMTick);
     ASSERT_TEST(emTick(em, 2) == EM_SUCCESS, destroyEMTick);
     ASSERT_TEST(emGetEventsAmount(em) == 0, destroyEMTick);
+    
 destroyEMTick:
     dateDestroy(start_date);
     destroyEventManager(em);
@@ -57,14 +58,14 @@ destroyEMTick:
 }
 
 bool (*tests[]) (void) = {
-        testEventManagerCreateDestroy,
-        testAddEventByDiffAndSize,
+        /* testEventManagerCreateDestroy,
+        testAddEventByDiffAndSize, */
         testEMTick
 };
 
 const char* testNames[] = {
-        "testEventManagerCreateDestroy",
-        "testAddEventByDiffAndSize",
+        /* "testEventManagerCreateDestroy",
+        "testAddEventByDiffAndSize", */
         "testEMTick"
 };
 
