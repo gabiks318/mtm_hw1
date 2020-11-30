@@ -3,7 +3,8 @@
 #include "../priority_queue.h"
 
 
-#define NUMBER_TESTS 4
+#define PQ PriorityQueue
+#define NUMBER_TESTS 1
 
 static PQElementPriority copyIntGeneric(PQElementPriority n) {
     if (!n) {
@@ -27,6 +28,41 @@ static int compareIntsGeneric(PQElementPriority n1, PQElementPriority n2) {
 
 static bool equalIntsGeneric(PQElementPriority n1, PQElementPriority n2) {
     return *(int *) n1 == *(int *) n2;
+}
+
+
+int *randInt() {
+    int *num = malloc(sizeof(int));
+    *num = rand() % 50000;
+    return num;
+}
+
+PriorityQueue createPQ() {
+    PriorityQueue pq = pqCreate(copyIntGeneric, freeIntGeneric, equalIntsGeneric, copyIntGeneric, freeIntGeneric,
+                                compareIntsGeneric);
+    return pq;
+}
+
+PriorityQueue getSingleElementPQ() {
+    PriorityQueue pq = createPQ();
+    int *element = randInt();
+    int *priority = randInt();
+    pqInsert(pq, element, priority);
+    free(element);
+    free(priority);
+    return pq;
+}
+
+PriorityQueue getMultipleElementPQ() {
+    PriorityQueue pq = createPQ();
+    for (int i = 0; i < 10; i++) {
+        int *element = randInt();
+        int *priority = randInt();
+        pqInsert(pq, element, priority);
+        free(element);
+        free(priority);
+    }
+    return pq;
 }
 
 bool testPQCreateDestroy() {
@@ -96,18 +132,43 @@ destroyPQIterator:
     return result;
 }
 
+bool testPQCopyMultipleElement() {
+    bool result = true;
+    PQ pq = getMultipleElementPQ();
+    PQ new_pq = pqCopy(pq);
+    ASSERT_TEST(new_pq != NULL, destroy);
+
+    int *new_pq_current_elem = pqGetFirst(new_pq);
+    int count = 1;
+    printf("\n");
+    PQ_FOREACH(int *, pq_current_elem, pq) {
+        printf("iteration no. %d: element value - %d, copied value - %d\n", count, *pq_current_elem, *new_pq_current_elem);
+        ASSERT_TEST(compareIntsGeneric(pq_current_elem, new_pq_current_elem) == 0, destroy);
+        ASSERT_TEST(pq_current_elem != new_pq_current_elem,
+                    destroy); // Copy should create a new copy so the pointers shouldn't be pointing to the same address
+        new_pq_current_elem = pqGetNext(new_pq);
+    }
+
+    destroy:
+    pqDestroy(pq);
+    pqDestroy(new_pq);
+    return result;
+}
+
 bool (*tests[]) (void) = {
-        testPQCreateDestroy,
+        /* testPQCreateDestroy,
         testPQInsertAndSize,
         testPQGetFirst,
-        testPQIterator
+        testPQIterator, */
+        testPQCopyMultipleElement
 };
 
 const char* testNames[] = {
-        "testPQCreateDestroy",
+        /* "testPQCreateDestroy",
         "testPQInsertAndSize",
         "testPQGetFirst",
-        "testPQIterator"
+        "testPQIterator", */
+        "testPQCopyMultipleElement"
 };
 
 int main(int argc, char *argv[]) {

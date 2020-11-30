@@ -7,4 +7,6 @@ set(MTM_FLAGS_RELEASE "${MTM_FLAGS_DEBUG} -DNDEBUG")
 
 set(CMAKE_C_FLAGS ${MTM_FLAGS_DEBUG})
 
-add_executable(my_executable main.c priority_queue.c)
+add_subdirectory("${PROJECT_SOURCE_DIR}/tests")
+
+add_executable(my_executable tests/pq_example_tests.c priority_queue.c)

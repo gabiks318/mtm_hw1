@@ -99,11 +99,31 @@ destroyPQIterator:
     return result;
 }
 
+bool testPQCopyMultipleElement() {
+    bool result = true;
+    PQ pq = getMultipleElementPQ();
+    PQ new_pq = pqCopy(pq);
+    ASSERT_TEST(new_pq != NULL, destroy);
+
+    int *new_pq_current_elem = pqGetFirst(new_pq);
+    PQ_FOREACH(int *, pq_current_elem, pq) {
+        ASSERT_TEST(compareIntsGeneric(pq_current_elem, new_pq_current_elem) == 0, destroy);
+        ASSERT_TEST(pq_current_elem != new_pq_current_elem,
+                    destroy); // Copy should create a new copy so the pointers shouldn't be pointing to the same address
+        new_pq_current_elem = pqGetNext(new_pq);
+    }
+
+    destroy:
+    pqDestroy(pq);
+    pqDestroy(new_pq);
+    return result;
+}
+
 bool (*tests[]) (void) = {
-        /* testPQCreateDestroy, */
-        /* testPQInsertAndSize, */
-        /* testPQGetFirst, */
-        /* testPQIterator */
+        testPQCreateDestroy,
+        testPQInsertAndSize,
+        testPQGetFirst,
+        testPQIterator
 };
 
 const char* testNames[] = {
