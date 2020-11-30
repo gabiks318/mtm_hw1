@@ -29,7 +29,7 @@ returns NULL in case of memory error, or node is NULL
 Node nodeCopyAll(Node node);
 Member nodeFindMemberById(Node node, int member_id);
 bool nodeMemberExists(Node node, Member member);
-void nodeMemberRemove(Node node, Member member);
+Node nodeMemberRemove(Node node, Member member);
 Member nodeGetMember(Node node);
 
 #define NODE_FOREACH(element, iterator)\

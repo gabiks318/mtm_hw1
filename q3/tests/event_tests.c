@@ -48,22 +48,40 @@ bool testEventAddRemoveMember(){
     Date date = dateCreate(1,2,2789);
     Event event = eventCreate("bestevent",2050,date);
     Member member = memberCreate(12345, "gabi");
+    Member member_2 = memberCreate(12346, "yan");
+    Member member_3 = memberCreate(12347, "borat");
     ASSERT_TEST(eventAddMember(event,member) ==EVENT_SUCCESS,returnEventAddRemoveMember);
-    printf("\n1\n");
+
     Node member_list = eventGetMemberList(event);
-    printf("2\n");
     Member tested_member = nodeGetMember(member_list);
-    printf("3\n");
     ASSERT_TEST(memberGetId(member)== 12345, returnEventAddRemoveMember);
     ASSERT_TEST(memberGetId(tested_member)== 12345, returnEventAddRemoveMember);
-
     ASSERT_TEST(memberEqual(tested_member, member),returnEventAddRemoveMember);
 
     eventRemoveMember(event, member);
+    member_list = eventGetMemberList(event);
     ASSERT_TEST(nodeGetMember(member_list) == NULL, returnEventAddRemoveMember);
+    
+    ASSERT_TEST(eventAddMember(event,member) == EVENT_SUCCESS,returnEventAddRemoveMember);
+    ASSERT_TEST(eventAddMember(event,member_2) == EVENT_SUCCESS,returnEventAddRemoveMember);
+    ASSERT_TEST(eventAddMember(event,member_3) == EVENT_SUCCESS,returnEventAddRemoveMember);
+
+    eventRemoveMember(event, member_2);
+    member_list = eventGetMemberList(event);
+    ASSERT_TEST(nodeMemberExists(member_list, member),returnEventAddRemoveMember);
+    ASSERT_TEST(nodeMemberExists(member_list, member_3),returnEventAddRemoveMember);
+    ASSERT_TEST(!nodeMemberExists(member_list, member_2),returnEventAddRemoveMember);
+
+    eventRemoveMember(event, member);
+    member_list = eventGetMemberList(event);
+    ASSERT_TEST(!nodeMemberExists(member_list, member),returnEventAddRemoveMember);
+    ASSERT_TEST(nodeMemberExists(member_list, member_3),returnEventAddRemoveMember);
+    ASSERT_TEST(!nodeMemberExists(member_list, member_2),returnEventAddRemoveMember);
     
 
     returnEventAddRemoveMember:
+        memberDestroy(member_2);
+        memberDestroy(member_3);
         memberDestroy(member);
         eventDestroy(event);
         dateDestroy(date);    

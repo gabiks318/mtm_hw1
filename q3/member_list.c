@@ -5,7 +5,7 @@
 
 #include "member_list.h"
 
-#define DEBUG true
+#define DEBUG false
 
 struct Node_t{
     Member member;
@@ -197,30 +197,31 @@ Member nodeFindMemberById(Node node, int member_id){
     return NULL;
 }
 
-void nodeMemberRemove(Node node, Member member){
-    // If first node removed, derefrence node and make it's value the second node
+Node nodeMemberRemove(Node node, Member member){
+    // If first node removed, derefrence node and make it's value the second node or null
     if(node == NULL || member == NULL){
-        return;
+        return NULL;
     }
 
     Node current_node = node;
+    Node first_node = node;
     Node temp_node = NULL;
     Member current_member = current_node->member;
     while(current_node != NULL){
         if(memberEqual(current_member, member)){
             if(temp_node == NULL){
                 if(current_node->next == NULL){
-                    node = NULL;
+                    first_node = NULL;
                 } else {
-                    *node = *current_node->next;
+                    first_node = current_node->next;
                 }
                 nodeDestroy(current_node);
-                return;
+                return first_node;
             }
 
             temp_node->next = current_node->next;
             nodeDestroy(current_node);
-            return;
+            return first_node;
         }
         temp_node = current_node;
         current_node = current_node->next;
@@ -228,4 +229,6 @@ void nodeMemberRemove(Node node, Member member){
             current_member = nodeGetMember(current_node);
         }
     }
+
+    return first_node;
 }

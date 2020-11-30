@@ -68,5 +68,7 @@ EventResult eventAddMember(Event event, Member member);
 Node eventGetMemberList(Event event);
 
 EventResult eventRemoveMember(Event event, Member member);
-                      
+
+bool eventMemeberExists(Event event, Member member);
+
 #endif

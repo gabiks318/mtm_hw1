@@ -5,7 +5,7 @@
 
 #include "member.h"
 
-#define DEBUG true
+#define DEBUG false
 
 
 static void printDebug(char* text){

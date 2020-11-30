@@ -8,7 +8,7 @@
 #include "member.h"
 #include "date.h"
 
-#define DEBUG true
+#define DEBUG false
 
 static void debugPrint(char* text){
     if(DEBUG){
@@ -139,7 +139,7 @@ EventResult eventAddMember(Event event, Member member)
     {
         return EVENT_NULL_ARGUMENT;
     }
-    if(event->event_members_list == NULL)// here I fixed if we are adding the first member so do this, we might want to move it to nodeAddNext
+    if(event->event_members_list == NULL)
     {
         event->event_members_list = nodeCreate(member);
         if(event->event_members_list == NULL)
@@ -156,14 +156,27 @@ EventResult eventAddMember(Event event, Member member)
     return EVENT_SUCCESS;
 }
 
+
+
 EventResult eventRemoveMember(Event event, Member member)
 {
     if(nodeMemberExists(event->event_members_list,member))
     {
          debugPrint("member exists");
-         nodeMemberRemove(event->event_members_list,member);
+         event->event_members_list = nodeMemberRemove(event->event_members_list,member);
+         if(event->event_members_list == NULL){
+             debugPrint("event member list is null");
+         }
          debugPrint("member removed");
          return EVENT_SUCCESS;
     }
     return EVENT_IVALID_MEMBER_ID;   
+}
+
+bool eventMemeberExists(Event event, Member member){
+    if(event == NULL || member == NULL){
+        return false;
+    }
+
+    return nodeMemberExists(event->event_members_list, member);
 }
