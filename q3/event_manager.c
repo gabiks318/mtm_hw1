@@ -4,11 +4,13 @@
 #include <stdio.h>
 
 #include "event_manager.h"
-#include "date.h"
 #include "priority_queue.h"
+#include "date.h"
 #include "member_list.h"
 #include "member.h"
 #include "event.h"
+
+#define EQUAL 0
 
 static void swap(int *p, int *q);
 static int findIndexofMax(int* arr, int size);
@@ -18,12 +20,47 @@ static Event eventManagerfindEventByID(EventManager em, int event_id);
 static EventManagerResult eventManagerAddMember(EventManager em, Member member);
 static Member eventManagerFindMemberbyID(EventManager em, int member_id);
 static int eventManagerMembersAmount(EventManager em);
+static PQElement copyEvent(PQElement event);
+static bool equalEvents(PQElement event1, PQElement event2);
+static void destroyEvent(PQElement event);
+static PQElementPriority copyDate(PQElementPriority date);
+static int compareDates(PQElementPriority date1, PQElementPriority date2);
+static void destroyDate(PQElementPriority date);
 
 struct EventManager_t{
     Date event_manager_date_created;
     PriorityQueue event_manager_event_list;
     Node event_manager_member_list;
 };
+
+static PQElement copyEvent(PQElement event){
+    return eventCopy(event);
+}
+
+static bool equalEvents(PQElement event1, PQElement event2){
+    if(strcmp(eventGetName((Event)event1),eventGetName((Event)event2)) == EQUAL
+    && dateCompare(eventGetDate((Event)event1),eventGetDate((Event)event2)) == EQUAL){
+        return true;
+    }
+
+    return false;
+}
+
+static void destroyEvent(PQElement event){
+    eventDestroy(event);
+}
+
+static PQElementPriority copyDate(PQElementPriority date){
+    return dateCopy(date);
+}
+
+static int compareDates(PQElementPriority date1, PQElementPriority date2){
+    return dateCompare(date1, date2);
+}
+
+static void destroyDate(PQElementPriority date){
+    dateDestroy(date);
+}
 
 static int eventManagerMembersAmount(EventManager em)
 {
@@ -114,8 +151,7 @@ EventManager createEventManager(Date date)
         return NULL;
     }
 
-   // PriorityQueue priority_queue = pqCreate((Event)(eventCopy)(Event), (void)(eventDestroy)(Event), (bool)(eventEqual)(Event,Event), (Date)(dateCopy)(Date), (void)(*dateDestroy)(Date), (int)(dateCompare)(Date,Date));
-    PriorityQueue priority_queue = pqCreate((eventCopy), (eventDestroy), (eventEqual), (dateCopy), (dateDestroy), (dateCompare) );
+    PriorityQueue priority_queue = pqCreate(copyEvent, destroyEvent, equalEvents, copyDate, destroyDate, compareDates );
 
     if(priority_queue == NULL)
     {
@@ -406,7 +442,7 @@ void emPrintAllEvents(EventManager em, const char* file_name)
     }
     char* current_name, *current_member_name;
     Date current_date;
-    int* day, *month, *year;
+    int* day = NULL, *month = NULL, *year = NULL;
     PQ_FOREACH(Event, iterator, em->event_manager_event_list)
     {
         if(iterator != NULL){
