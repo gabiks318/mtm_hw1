@@ -10,7 +10,7 @@
 #include "member.h"
 #include "event.h"
 
-#define DEBUG true
+#define DEBUG false
 #define EQUAL 0
 
 static void debugPrint(char* text){
@@ -116,7 +116,7 @@ static bool eventManagerEventExists(EventManager em, Date date, char* event_name
     PQ_FOREACH(Event, iterator, em->event_manager_event_list)
     {
         if(iterator != NULL){
-            if(dateCompare(eventGetDate(iterator), date) == 0 && strcmp(event_name,eventGetName(iterator)) == 0)
+            if(dateCompare(eventGetDate(iterator), date) == EQUAL && strcmp(event_name,eventGetName(iterator)) == EQUAL)
             {
                 return true;
             }
@@ -127,7 +127,7 @@ static bool eventManagerEventExists(EventManager em, Date date, char* event_name
 }
 
 static Event eventManagerfindEventByID(EventManager em, int event_id){
-    if(em == 0 || event_id < 0){
+    if(em == NULL || event_id < 0){
         return NULL;
     }
 
@@ -426,7 +426,7 @@ EventManagerResult emTick(EventManager em, int days)
      for(int i = 0; i < days; i++)
     {
         Event first_event = pqGetFirst(em->event_manager_event_list);
-        while(dateCompare(eventGetDate(first_event), em->event_manager_date_created) == EQUAL)
+        while(first_event != NULL && dateCompare(eventGetDate(first_event), em->event_manager_date_created) == EQUAL)
         {
             emRemoveEvent(em, eventGetID(first_event));
             first_event = pqGetFirst(em->event_manager_event_list);

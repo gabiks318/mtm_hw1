@@ -3,8 +3,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#define DEBUG false
 
-#define NUMBER_TESTS 1
+
+static void debugPrint(char* text){
+    if(DEBUG){
+        printf(text);
+        printf("\n");
+    }
+}
+#define NUMBER_TESTS 3
 
 bool testEventManagerCreateDestroy() {
     bool result = true;
@@ -40,15 +48,19 @@ destroyAddEventByDiffAndSize:
 }
 
 bool testEMTick() {
-bool result = true;
-
+    bool result = true;
+     debugPrint("0");
     Date start_date = dateCreate(1,12,2020);
     EventManager em = createEventManager(start_date);
 
     char* event_name = "event1";
+    debugPrint("1");
     ASSERT_TEST(emAddEventByDiff(em, event_name, 1, 1) == EM_SUCCESS, destroyEMTick);
+    debugPrint("2");
     ASSERT_TEST(emGetEventsAmount(em) == 1, destroyEMTick);
+    debugPrint("3");
     ASSERT_TEST(emTick(em, 2) == EM_SUCCESS, destroyEMTick);
+    debugPrint("4");
     ASSERT_TEST(emGetEventsAmount(em) == 0, destroyEMTick);
     
 destroyEMTick:
@@ -58,14 +70,14 @@ destroyEMTick:
 }
 
 bool (*tests[]) (void) = {
-        /* testEventManagerCreateDestroy,
-        testAddEventByDiffAndSize, */
+        testEventManagerCreateDestroy,
+        testAddEventByDiffAndSize, 
         testEMTick
 };
 
 const char* testNames[] = {
-        /* "testEventManagerCreateDestroy",
-        "testAddEventByDiffAndSize", */
+        "testEventManagerCreateDestroy",
+        "testAddEventByDiffAndSize", 
         "testEMTick"
 };
 
