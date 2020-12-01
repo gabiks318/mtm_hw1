@@ -423,10 +423,16 @@ EventManagerResult emTick(EventManager em, int days)
         return EM_INVALID_DATE;
     }
     
-    for(int i = 0; i < days; i++){
+     for(int i = 0; i < days; i++)
+    {
+        Event first_event = pqGetFirst(em->event_manager_event_list);
+        while(dateCompare(eventGetDate(first_event), em->event_manager_date_created) == EQUAL)
+        {
+            emRemoveEvent(em, eventGetID(first_event));
+            first_event = pqGetFirst(em->event_manager_event_list);
+        }
         dateTick(em->event_manager_date_created);
     }
-    
     return EM_SUCCESS;
     
 }
