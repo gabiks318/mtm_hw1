@@ -1,0 +1,18 @@
+CC = gcc 
+OBJS = event.o date.o event_manager.o main.o member_list.o member.o
+EXEC = my_executable
+DEBUG=
+CFLAGS = -std=c99 -o event_manager -Wall -pedantic-errors -Werror -DNDEBUG *.c tests/eventManagerTests*.c -L. -lpriority_queue
+
+$(EXEC) : $(OBJS)
+    $(CC) $(DEBUG_FLAG) $(OBJS) -o $@
+
+my_executable: date.o event.o event_manager.o member.o member_list.o
+date.o: date.c date.h
+event.o: event.c event.h member.h date.h member_list.h
+event_manager.o: event_manager.c event_manager.h date.h priority_queue.h member_list.h member.h event.h
+member.o: member.c member.h
+member_list.o: member_list.c member_list.h member.h
+
+clean:
+    rm -f $(OBJS)
