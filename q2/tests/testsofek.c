@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include "test_utilities.h"
-#include "priority_queue.h"
+
+#include <stdio.h>
+#include "../priority_queue.h"
 
 #define PQ PriorityQueue
 
@@ -66,7 +68,7 @@ PriorityQueue getMultipleElementPQ() {
 
 
 /* ============= TESTING pqCreate ============= */
-bool testPQCreateStandardTest () {
+bool testPQCreateStandardTest() {
     bool result = true;
     PQ pq = createPQ();
     ASSERT_TEST(pq != NULL, destroy);
@@ -626,16 +628,57 @@ bool testPQGetNextIteratorStaysTheSameInMostFunction() {
     pqInsert(pq, &elem2, &elem2);
     pqInsert(pq, &elem3, &elem3);
 
-    ASSERT_TEST((*(int *)pqGetFirst(pq)) == 3, destroy);
-    ASSERT_TEST((*(int *)pqGetNext(pq)) == 2, destroy);
+    printf("meir1\n");
+    ASSERT_TEST((*(int *) pqGetFirst(pq)) == 3, destroy);
+    printf("meir2\n");
+    ASSERT_TEST((*(int *) pqGetNext(pq)) == 2, destroy);
 
     PQ pq_temp = createPQ();
     pqDestroy(pq_temp);
     pqContains(pq, &elem1);
     pqGetSize(pq);
+    printf("meir3\n");
+    ASSERT_TEST((*(int *) pqGetNext(pq)) == 1, destroy);
+    destroy:
+    pqDestroy(pq);
+    return result;
+}
 
-    ASSERT_TEST((*(int *)pqGetNext(pq)) == 1, destroy);
 
+bool testPQIteratorPointsToNullAfterSomeOfTheFunctions() {
+    bool result = true;
+    PQ pq = getMultipleElementPQ();
+
+    int elem1 = 1;
+    pqInsert(pq, &elem1, &elem1);
+
+    pqGetFirst(pq);
+    ASSERT_TEST(pqGetNext(pq) != NULL, destroy);
+
+    ASSERT_TEST(pqGetFirst(pq) != NULL, destroy);
+    pqInsert(pq, &elem1, &elem1);
+    ASSERT_TEST(pqGetNext(pq) == NULL, destroy);
+
+    ASSERT_TEST(pqGetFirst(pq) != NULL, destroy);
+    pqRemove(pq);
+    ASSERT_TEST(pqGetNext(pq) == NULL, destroy);
+
+    ASSERT_TEST(pqGetFirst(pq) != NULL, destroy);
+    pqRemoveElement(pq, &elem1);
+    ASSERT_TEST(pqGetNext(pq) == NULL, destroy);
+
+    ASSERT_TEST(pqGetFirst(pq) != NULL, destroy);
+    PQ new_pq = pqCopy(pq);
+    ASSERT_TEST(pqGetNext(pq) == NULL, destroyNewPq);
+    ASSERT_TEST(pqGetNext(new_pq) == NULL, destroyNewPq);
+
+    ASSERT_TEST(pqGetFirst(pq) != NULL, destroy);
+    int new_prio = 5;
+    pqChangePriority(pq, &elem1, &elem1, &new_prio);
+    ASSERT_TEST(pqGetNext(pq) == NULL, destroy);
+
+    destroyNewPq:
+    pqDestroy(new_pq);
     destroy:
     pqDestroy(pq);
     return result;
@@ -749,6 +792,8 @@ bool (*tests[])(void) = {
         testPQInsertAndSize,
         testPQGetFirst,
         testPQIterator,
+        testPQIteratorPointsToNullAfterSomeOfTheFunctions,
+        testPQGetNextIteratorStaysTheSameInMostFunction,
         testMemoryPQDestroyEmptyPQ,
         testMemoryPQDestroySingleElement,
         testMemoryPQDestroyMultipleElement,
@@ -778,7 +823,6 @@ bool (*tests[])(void) = {
         testPQSGetFirstStandardTest,
         testPQGetNextStandardTest,
         testPQGetNextTraversesTheQueueCorrectlyByPriority,
-        testPQGetNextIteratorStaysTheSameInMostFunction,
         testPQClearStandardTest,
         testPQClearWorksOkayOnEmptyQueue
 };
@@ -789,6 +833,8 @@ const char *testNames[] = {
         "testPQInsertAndSize",
         "testPQGetFirst",
         "testPQIterator",
+        "testPQIteratorPointsToNullAfterSomeOfTheFunctions",
+        "testPQGetNextIteratorStaysTheSameInMostFunction",
         "testMemoryPQDestroyEmptyPQ",
         "testMemoryPQDestroySingleElement",
         "testMemoryPQDestroyMultipleElement",
@@ -818,7 +864,6 @@ const char *testNames[] = {
         "testPQSGetFirstStandardTest",
         "testPQGetNextStandardTest",
         "testPQGetNextTraversesTheQueueCorrectlyByPriority",
-        "testPQGetNextIteratorStaysTheSameInMostFunction",
         "testPQClearStandardTest",
         "testPQClearWorksOkayOnEmptyQueue"
 };
@@ -829,6 +874,8 @@ const char *testFailDescriptions[] = {
         "Please refer to the testing code at function: testPQInsertAndSize",
         "Please refer to the testing code at function: testPQGetFirst",
         "Please refer to the testing code at function: testPQIterator",
+        "According to the course segel after the following functions the iterator should be null: pqInsert, pqCopy (both pqs), pqChangePriority, pqRemove, pqRemoveElement. If the test failed, your iterator isn't NULL after one of these functions",
+        "Please refer to the testing code at function: testPQGetNextIteratorStaysTheSameInMostFunction",
         "Please refer to the testing code at function: testMemoryPQDestroyEmptyPQ",
         "Please refer to the testing code at function: testMemoryPQDestroySingleElement",
         "Please refer to the testing code at function: testMemoryPQDestroyMultipleElement",
@@ -858,18 +905,17 @@ const char *testFailDescriptions[] = {
         "Please refer to the testing code at function: testPQSGetFirstStandardTest",
         "Please refer to the testing code at function: testPQGetNextStandardTest",
         "Please refer to the testing code at function: testPQGetNextTraversesTheQueueCorrectlyByPriority",
-        "Please refer to the testing code at function: testPQGetNextIteratorStaysTheSameInMostFunction",
         "Please refer to the testing code at function: testPQClearStandardTest",
         "Please refer to the testing code at function: testPQClearWorksOkayOnEmptyQueue"
 };
 
 
-#define NUMBER_TESTS 37
+#define NUMBER_TESTS 38
 
 int main(int argc, char **argv) {
     if (argc == 1) {
         for (int test_idx = 0; test_idx < NUMBER_TESTS; test_idx++) {
-            RUN_TEST(tests[test_idx], testNames[test_idx], testFailDescriptions[test_idx]);
+            RUN_TEST(tests[test_idx], testNames[test_idx]);
         }
         return 0;
     }
@@ -884,7 +930,7 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    RUN_TEST(tests[test_idx - 1], testNames[test_idx - 1], testFailDescriptions[test_idx - 1]);
+    RUN_TEST(tests[test_idx - 1], testNames[test_idx - 1]);
     return 0;
 
 }

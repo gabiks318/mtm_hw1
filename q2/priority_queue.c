@@ -109,6 +109,8 @@ PriorityQueue pqCopy(PriorityQueue queue)
         pqGetNext(queue);
     }
 
+    queue->iterator = NULL;
+    new_queue->iterator = NULL;
     return new_queue;
 }
 
@@ -121,9 +123,13 @@ int pqGetSize(PriorityQueue queue)
         return -1;
     }
 
+    Node temp_iterator = queue->iterator;
     int size = 0;
-    if (pqGetFirst(queue) == NULL)
+    if (pqGetFirst(queue) == NULL){
+        queue->iterator = temp_iterator;
         return size;
+    }
+        
 
     while(queue->iterator != NULL)
     {
@@ -134,31 +140,36 @@ int pqGetSize(PriorityQueue queue)
     }
     printDebug("ending count");
 
+    queue->iterator = temp_iterator;
     return size;
 }
 
 bool pqContains(PriorityQueue queue, PQElement element)
 {
-    printDebug("Checking if conatins");
+    printDebug("Checking if contains");
     if (queue == NULL || element == NULL)
     {
         return false;
     }
+    Node temp_iterator = queue->iterator;
     pqGetFirst(queue);
     while (queue->iterator)
     {
         if (queue->equal_elements(element, queue->iterator->pq_element))
         {
             printDebug("Element in queue");
+            queue->iterator = temp_iterator;
             return true;
         }
         pqGetNext(queue);
     }
+    queue->iterator = temp_iterator;
     return false;
 }
 
 PriorityQueueResult pqInsert(PriorityQueue queue, PQElement element, PQElementPriority priority)
 {
+    queue->iterator = NULL;
     if (queue == NULL || element == NULL || priority == NULL)
     {
         return PQ_NULL_ARGUMENT;
@@ -210,7 +221,7 @@ PriorityQueueResult pqInsert(PriorityQueue queue, PQElement element, PQElementPr
     }
 
     printDebug("Node Inserted");
-
+    queue->iterator = NULL;
     return PQ_SUCCESS;
 }
 
@@ -234,6 +245,7 @@ PriorityQueueResult pqChangePriority(PriorityQueue queue, PQElement element,
         return PQ_OUT_OF_MEMORY;
     }
 
+    queue->iterator = NULL;
     printDebug("Changing element priority success");
     return PQ_SUCCESS;
 }
@@ -250,6 +262,7 @@ PriorityQueueResult pqRemove(PriorityQueue queue)
     queue->list = queue->iterator;
     destroyNode(temp_node, queue);
 
+    queue->iterator = NULL;
     return PQ_SUCCESS;
 }
 
@@ -292,6 +305,7 @@ PriorityQueueResult pqRemoveElement(PriorityQueue queue, PQElement element)
         return PQ_ELEMENT_DOES_NOT_EXISTS;
     }
 
+    queue->iterator = NULL;
     return PQ_SUCCESS;
 }
 
@@ -341,6 +355,7 @@ PriorityQueueResult pqClear(PriorityQueue queue)
     {
         return PQ_NULL_ARGUMENT;
     }
+
 
     int queue_size = pqGetSize(queue);
     for (int i = 0; i < queue_size; i++)
