@@ -36,7 +36,7 @@ struct PriorityQueue_t
 };
 
 //function declaration
-static Node createNode(PQElement element, PQElementPriority priority, PriorityQueue queue);
+static Node createNode(PQElement element, PQElementPriority priority, PriorityQueue queue, CopyPQElement copy_element, CopyPQElementPriority copy_priority);
 static void destroyNode(Node node, PriorityQueue queue);
 static Node pqCheckElementExists(PriorityQueue queue, PQElement element, PQElementPriority priority);
 static PriorityQueueResult pqRemoveElementPriority(PriorityQueue queue, PQElement element, PQElementPriority priority);
@@ -58,7 +58,7 @@ PriorityQueue pqCreate(CopyPQElement copy_element, FreePQElement free_element,
         return NULL;
     }
 
-    PriorityQueue priority_queue = malloc(sizeof(*priority_queue));
+    PriorityQueue priority_queue = (PriorityQueue) malloc(sizeof(*priority_queue));
     if (priority_queue == NULL){
         return NULL;
     }
@@ -175,7 +175,7 @@ PriorityQueueResult pqInsert(PriorityQueue queue, PQElement element, PQElementPr
         return PQ_NULL_ARGUMENT;
     }
     printDebug("Creating Node");
-    Node newNode = createNode(element, priority, queue);
+    Node newNode = createNode(element, priority, queue, queue->copy_element, queue->copy_priority);
     if (newNode == NULL)
     {
         return PQ_OUT_OF_MEMORY;
@@ -287,6 +287,7 @@ PriorityQueueResult pqRemoveElement(PriorityQueue queue, PQElement element)
                 pqGetNext(queue);
                 queue->list = queue->iterator;
                 destroyNode(node_to_remove, queue);
+                break;
             }
             else
             {
@@ -294,6 +295,7 @@ PriorityQueueResult pqRemoveElement(PriorityQueue queue, PQElement element)
                 pqGetNext(queue);
                 destroyNode(node_to_remove, queue);
                 temp_node->next = queue->iterator;
+                break;
             }
         }
         temp_node = queue->iterator;
@@ -357,10 +359,16 @@ PriorityQueueResult pqClear(PriorityQueue queue)
     }
 
 
-    int queue_size = pqGetSize(queue);
+    /* int queue_size = pqGetSize(queue);
     for (int i = 0; i < queue_size; i++)
     {
         pqRemove(queue);
+    } */
+
+    pqGetFirst(queue);
+    while(queue->iterator != NULL){
+        pqRemove(queue);
+        pqGetFirst(queue);
     }
 
     return PQ_SUCCESS;
@@ -395,9 +403,11 @@ static PriorityQueueResult pqRemoveElementPriority(PriorityQueue queue, PQElemen
 
     while (queue->iterator)
     {
+
         current_node = queue->iterator;
         if (queue->equal_elements(current_node->pq_element, element) && queue->compare_priority(current_node->pq_element_priority, priority) == 0)
         {
+            printDebug("found element to change priority");
             found = true;
             if (temp_node == NULL)
             {
@@ -406,13 +416,15 @@ static PriorityQueueResult pqRemoveElementPriority(PriorityQueue queue, PQElemen
                 pqGetNext(queue);
                 queue->list = queue->iterator;
                 destroyNode(node_to_remove, queue);
+                break;
             }
             else
             {
                 node_to_remove = queue->iterator;
                 pqGetNext(queue);
-                destroyNode(node_to_remove, queue);
                 temp_node->next = queue->iterator;
+                destroyNode(node_to_remove, queue);
+                break;
             }
         }
         temp_node = queue->iterator;
@@ -475,19 +487,19 @@ static ComparePQElementPriorities getElementPriorityCompareFunction(PriorityQueu
     return queue->compare_priority;
 } */
 
-static Node createNode(PQElement element, PQElementPriority priority, PriorityQueue queue)
+static Node createNode(PQElement element, PQElementPriority priority, PriorityQueue queue, CopyPQElement copy_element, CopyPQElementPriority copy_priority)
 {
     if(priority == NULL || element == NULL || queue == NULL )
         return NULL;
     
-    Node ptr = malloc(sizeof(*ptr));
-    if (!ptr)
+    Node ptr = (Node)malloc(sizeof(*ptr));
+    if (ptr == NULL)
     {
         return NULL;
     }
     ptr->next = NULL;
 
-    PQElement element_copy = queue->copy_element(element);
+    PQElement element_copy = copy_element(element);
     if (element_copy == NULL)
     {
         free(ptr);
@@ -495,7 +507,7 @@ static Node createNode(PQElement element, PQElementPriority priority, PriorityQu
     }
     ptr->pq_element = element_copy;
 
-    PQElementPriority priority_copy = queue->copy_priority(priority);
+    PQElementPriority priority_copy = copy_priority(priority);
     if(priority_copy == NULL){
         free(element_copy);
         free(ptr);

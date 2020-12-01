@@ -1,7 +1,5 @@
 #include <stdlib.h>
 #include "test_utilities.h"
-
-#include <stdio.h>
 #include "../priority_queue.h"
 
 #define PQ PriorityQueue
@@ -460,6 +458,24 @@ bool testPQChangePriorityWOnlyChangesFirstOfMultipleSameElementsAndReinsertsIt()
     return result;
 }
 
+bool testChangePriorityByRef(){
+    bool result = true;
+    PriorityQueue pq = pqCreate(copyIntGeneric, freeIntGeneric, equalIntsGeneric, copyIntGeneric, freeIntGeneric, compareIntsGeneric);
+ 
+    int elem1 = 5;
+    ASSERT_TEST(pqInsert(pq, &elem1, &elem1) == PQ_SUCCESS, destroy);
+ 
+    int* elem1_ptr =(int *)pqGetFirst(pq);
+    ASSERT_TEST(*elem1_ptr == elem1, destroy);
+ 
+    ASSERT_TEST(pqChangePriority(pq, elem1_ptr, elem1_ptr, elem1_ptr) == PQ_SUCCESS, destroy);
+    elem1_ptr = (int *)pqGetFirst(pq);
+    ASSERT_TEST(*elem1_ptr == elem1, destroy);
+ 
+    destroy:
+    pqDestroy(pq);
+    return result;
+}
 
 
 /* ============= TESTING pqRemove ============= */
@@ -628,17 +644,16 @@ bool testPQGetNextIteratorStaysTheSameInMostFunction() {
     pqInsert(pq, &elem2, &elem2);
     pqInsert(pq, &elem3, &elem3);
 
-    printf("meir1\n");
     ASSERT_TEST((*(int *) pqGetFirst(pq)) == 3, destroy);
-    printf("meir2\n");
     ASSERT_TEST((*(int *) pqGetNext(pq)) == 2, destroy);
 
     PQ pq_temp = createPQ();
     pqDestroy(pq_temp);
     pqContains(pq, &elem1);
     pqGetSize(pq);
-    printf("meir3\n");
+
     ASSERT_TEST((*(int *) pqGetNext(pq)) == 1, destroy);
+
     destroy:
     pqDestroy(pq);
     return result;
@@ -824,7 +839,8 @@ bool (*tests[])(void) = {
         testPQGetNextStandardTest,
         testPQGetNextTraversesTheQueueCorrectlyByPriority,
         testPQClearStandardTest,
-        testPQClearWorksOkayOnEmptyQueue
+        testPQClearWorksOkayOnEmptyQueue,
+        testChangePriorityByRef
 };
 
 const char *testNames[] = {
@@ -865,7 +881,8 @@ const char *testNames[] = {
         "testPQGetNextStandardTest",
         "testPQGetNextTraversesTheQueueCorrectlyByPriority",
         "testPQClearStandardTest",
-        "testPQClearWorksOkayOnEmptyQueue"
+        "testPQClearWorksOkayOnEmptyQueue",
+        "testChangePriorityByRef"
 };
 
 const char *testFailDescriptions[] = {
@@ -910,7 +927,7 @@ const char *testFailDescriptions[] = {
 };
 
 
-#define NUMBER_TESTS 38
+#define NUMBER_TESTS 39
 
 int main(int argc, char **argv) {
     if (argc == 1) {
