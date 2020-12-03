@@ -6,6 +6,15 @@
 #define MAX_DAY 30
 #define MAX_MONTH 12
 
+#define DEBUG false
+
+static void debugPrint(char* text){
+    if(DEBUG){
+        printf(text);
+        printf("\n");
+    }
+}
+
 struct Date_t {
     int day;
     int month;
@@ -56,6 +65,7 @@ Date dateCopy(Date date)
 }
 bool dateGet(Date date, int* day, int* month, int* year)
 {
+    debugPrint("getting date");
     if(date == NULL || day == NULL || month == NULL || year == NULL)
     {
         return false;
@@ -63,7 +73,7 @@ bool dateGet(Date date, int* day, int* month, int* year)
     *day = date->day;
     *month = date->month;
     *year = date->year;
-  
+    debugPrint("got date");
     return true;
 }
 int dateCompare(Date date1, Date date2)
@@ -95,13 +105,14 @@ int dateCompare(Date date1, Date date2)
 }
 void dateTick(Date date)
 {
-
+    debugPrint("Ticking date");
     if(date == NULL)
     {
         return;
     }
     if(date->day == MAX_DAY && date->month == MAX_MONTH)
     {
+        debugPrint("Ticking year");
         date->year++;
         date->month = 1;
         date->day = 1;
@@ -109,11 +120,13 @@ void dateTick(Date date)
     }
     if(date->day == MAX_DAY)
     {
+        debugPrint("Ticking month");
         date->day = 1;
         date->month++;
         return;
     }
     date->day++;
+    debugPrint("date ticked");
     return;
 }
 

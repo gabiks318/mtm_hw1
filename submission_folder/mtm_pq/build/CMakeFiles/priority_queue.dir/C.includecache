@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/priority_queue.h
+stdbool.h
+-
+
+/home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/tests/pq_example_tests.c
+stdlib.h
+-
+test_utilities.h
+/home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/tests/test_utilities.h
+../priority_queue.h
+/home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/priority_queue.h
+
+/home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/tests/test_utilities.h
+stdbool.h
+-
+stdio.h
+-
+

@@ -1,0 +1,32 @@
+[
+{
+  "directory": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/build",
+  "command": "/usr/bin/x86_64-redhat-linux-gcc   -std=c99 --pedantic-errors -Wall -Werror -g   -o CMakeFiles/event_manager.dir/tests/event_manager_example_tests.c.o   -c /home/yant/mtm/mtm_hw1/submission_folder/mtm_em/tests/event_manager_example_tests.c",
+  "file": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/tests/event_manager_example_tests.c"
+},
+{
+  "directory": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/build",
+  "command": "/usr/bin/x86_64-redhat-linux-gcc   -std=c99 --pedantic-errors -Wall -Werror -g   -o CMakeFiles/event_manager.dir/event_manager.c.o   -c /home/yant/mtm/mtm_hw1/submission_folder/mtm_em/event_manager.c",
+  "file": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/event_manager.c"
+},
+{
+  "directory": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/build",
+  "command": "/usr/bin/x86_64-redhat-linux-gcc   -std=c99 --pedantic-errors -Wall -Werror -g   -o CMakeFiles/event_manager.dir/event.c.o   -c /home/yant/mtm/mtm_hw1/submission_folder/mtm_em/event.c",
+  "file": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/event.c"
+},
+{
+  "directory": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/build",
+  "command": "/usr/bin/x86_64-redhat-linux-gcc   -std=c99 --pedantic-errors -Wall -Werror -g   -o CMakeFiles/event_manager.dir/date.c.o   -c /home/yant/mtm/mtm_hw1/submission_folder/mtm_em/date.c",
+  "file": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/date.c"
+},
+{
+  "directory": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/build",
+  "command": "/usr/bin/x86_64-redhat-linux-gcc   -std=c99 --pedantic-errors -Wall -Werror -g   -o CMakeFiles/event_manager.dir/member_list.c.o   -c /home/yant/mtm/mtm_hw1/submission_folder/mtm_em/member_list.c",
+  "file": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/member_list.c"
+},
+{
+  "directory": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/build",
+  "command": "/usr/bin/x86_64-redhat-linux-gcc   -std=c99 --pedantic-errors -Wall -Werror -g   -o CMakeFiles/event_manager.dir/member.c.o   -c /home/yant/mtm/mtm_hw1/submission_folder/mtm_em/member.c",
+  "file": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/member.c"
+}
+]

@@ -1,0 +1,5 @@
+/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/build/CMakeFiles/rebuild_cache.dir
+/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/build/CMakeFiles/edit_cache.dir
+/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/build/CMakeFiles/event_manager.dir
+/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/build/tests/CMakeFiles/rebuild_cache.dir
+/home/yant/mtm/mtm_hw1/submission_folder/mtm_em/build/tests/CMakeFiles/edit_cache.dir

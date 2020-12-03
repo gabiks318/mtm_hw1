@@ -1,0 +1,5 @@
+/home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/build/CMakeFiles/rebuild_cache.dir
+/home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/build/CMakeFiles/edit_cache.dir
+/home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/build/CMakeFiles/priority_queue.dir
+/home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/build/tests/CMakeFiles/rebuild_cache.dir
+/home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/build/tests/CMakeFiles/edit_cache.dir
