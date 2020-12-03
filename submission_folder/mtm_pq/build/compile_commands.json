@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/build",
+  "command": "/usr/bin/x86_64-redhat-linux-gcc   -std=c99 --pedantic-errors -Wall -Werror -g   -o CMakeFiles/priority_queue.dir/tests/pq_example_tests.c.o   -c /home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/tests/pq_example_tests.c",
+  "file": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/tests/pq_example_tests.c"
+},
+{
+  "directory": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/build",
+  "command": "/usr/bin/x86_64-redhat-linux-gcc   -std=c99 --pedantic-errors -Wall -Werror -g   -o CMakeFiles/priority_queue.dir/priority_queue.c.o   -c /home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/priority_queue.c",
+  "file": "/home/yant/mtm/mtm_hw1/submission_folder/mtm_pq/priority_queue.c"
+}
+]
