@@ -1,28 +1,37 @@
 CC = gcc 
-OBJS1 = event.o date.o event_manager.o member_list.o member.o
-OBJS2: priority_queue.o
+OBJS1 = event.o date.o event_manager.o member.o event_manager_example_tests.o
+OBJS2 = priority_queue.o pq_example_tests.o
 EXEC1 = event_manager 
 EXEC2 = priority_queue
-DEBUG =
-CFLAGS = -std=c99 -o -Wall -pedantic-errors -Werror -DNDEBUG 
+DEBUG = -pedantic-errors -DNDEBUG 
+CFLAGS = -std=c99 -o -Wall  -Werror 
 
-$(EXEC1) : $(OBJS1)
+$(EXEC1) : $(OBJS1) 
     $(CC) $(DEBUG) $(OBJS1) -o $@
 
 $(EXEC2) : $(OBJS2)
     $(CC) $(DEBUG) $(OBJS2) -o $@
 
-priority_queue.o: mtm_pq/priority_queue.c mtm_pq/priority_queue.h
+pq_example_tests.o: pq_example_tests.c priority_queue.h test_utilities.h
+    $(CC) -c $(DEBUG) $(CFLAGS)$*.c
 
-date.o: mtm_em/date.c mtm_em/date.h
+event_manager_example_tests.o: event_manager_example_tests.c event_manager.h test_utilities.h
+    $(CC) -c $(DEBUG) $(CFLAGS)$*.c
+
+priority_queue.o: priority_queue.c priority_queue.h
+    $(CC) -c $(DEBUG) $(CFLAGS)$*.c
+
+date.o: date.c date.h
+    $(CC) -c $(DEBUG) $(CFLAGS)$*.c
   
-event.o: mtm_em/event.c mtm_em/event.h mtm_em/member.h mtm_em/date.h mtm_em/member_list.h
+event.o: event.c event.h member.h date.h priority_queue.h
+    $(CC) -c $(DEBUG) $(CFLAGS)$*.c
 
-event_manager.o: mtm_em/event_manager.c mtm_em/event_manager.h mtm_em/date.h mtm_em/priority_queue.h mtm_em/member_list.h mtm_em/member.h mtm_em/event.h
-   
-member.o: mtm_em/member.c mtm_em/member.h
-    
-member_list.o: mtm_em/member_list.c mtm_em/member_list.h mtm_em/member.h
+event_manager.o: event_manager.c event_manager.h date.h priority_queue.h member.h event.h
+    $(CC) -c $(DEBUG) $(CFLAGS)$*.c
+
+member.o: member.c member.h
+    $(CC) -c $(DEBUG) $(CFLAGS)$*.c
   
 clean:
     rm -f $(OBJS1)
