@@ -54,12 +54,12 @@ void memberDestroy(Member member)
     free(member);
 }
 
-int memberGetId(Member member){
+int* memberGetId(Member member){
     if(member == NULL){
-        return -1;
+        return NULL;
     }
 
-    return member->member_id;
+    return &member->member_id;
 }
 
 char* memberGetName(Member member){

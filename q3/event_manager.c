@@ -6,7 +6,6 @@
 #include "event_manager.h"
 #include "priority_queue.h"
 #include "date.h"
-#include "member_list.h"
 #include "member.h"
 #include "event.h"
 
@@ -20,14 +19,11 @@ static void debugPrint(char* text){
     }
 }
 
-static void swap(int *p, int *q);
-static int findIndexofMax(int* arr, int size);
-static void maxSortTwoArrays(int* arr1, int* arr2, int size);
+
 static bool eventManagerEventExists(EventManager em, Date date, char* event_name);
 static Event eventManagerfindEventByID(EventManager em, int event_id);
-static EventManagerResult eventManagerAddMember(EventManager em, Member member);
 static Member eventManagerFindMemberbyID(EventManager em, int member_id);
-static int eventManagerMembersAmount(EventManager em);
+
 static PQElement copyEvent(PQElement event);
 static bool equalEvents(PQElement event1, PQElement event2);
 static void destroyEvent(PQElement event);
@@ -35,104 +31,140 @@ static PQElementPriority copyDate(PQElementPriority date);
 static int compareDates(PQElementPriority date1, PQElementPriority date2);
 static void destroyDate(PQElementPriority date);
 
+static PQElement copyMember(PQElement member);
+static bool equalMembers(PQElement member1, PQElement member2);
+static void destroyMember(PQElement member);
+static PQElementPriority copyID(PQElementPriority ID);
+static int compareID(PQElementPriority ID1, PQElementPriority ID2);
+static void destroyID(PQElementPriority ID);
+
+
 struct EventManager_t{
-    Date event_manager_date_created;
+    Date event_manager_date;
     PriorityQueue event_manager_event_list;
-    Node event_manager_member_list;
+    PriorityQueue event_manager_member_list;
 };
 
-static PQElement copyEvent(PQElement event){
+static PQElement copyMember(PQElement member)
+{
+    return memberCopy(member);
+}
+
+static bool equalMembers(PQElement member1, PQElement member2)
+{
+    return memberEqual(member1, member2);
+}
+
+static void destroyMember(PQElement member)
+{
+    memberDestroy(member);
+}
+
+static PQElementPriority copyID(PQElementPriority ID)
+{
+    if(!ID)
+    {
+        return NULL;
+    }
+    int *copy = malloc(sizeof(*copy));
+    if(!copy)
+    {
+        return NULL;
+    }
+
+    *copy = *(int*)ID;
+    return copy;
+}
+
+static int compareID(PQElementPriority ID1, PQElementPriority ID2)
+{
+    return (*(int *)ID2 - *(int *)ID1);
+}
+
+static void destroyID(PQElementPriority ID)
+{
+    free(ID);
+}
+
+
+static PQElement copyEvent(PQElement event)
+{
     return eventCopy(event);
 }
 
-static bool equalEvents(PQElement event1, PQElement event2){
+static bool equalEvents(PQElement event1, PQElement event2)
+{
     if(strcmp(eventGetName((Event)event1),eventGetName((Event)event2)) == EQUAL
-    && dateCompare(eventGetDate((Event)event1),eventGetDate((Event)event2)) == EQUAL){
+    && dateCompare(eventGetDate((Event)event1),eventGetDate((Event)event2)) == EQUAL)
+    {
         return true;
     }
 
     return false;
 }
 
-static void destroyEvent(PQElement event){
+static void destroyEvent(PQElement event)
+{
     eventDestroy(event);
 }
 
-static PQElementPriority copyDate(PQElementPriority date){
+static PQElementPriority copyDate(PQElementPriority date)
+{
     return dateCopy(date);
 }
 
-static int compareDates(PQElementPriority date1, PQElementPriority date2){
+static int compareDates(PQElementPriority date1, PQElementPriority date2)
+{
     return dateCompare(date1, date2);
 }
 
-static void destroyDate(PQElementPriority date){
+static void destroyDate(PQElementPriority date)
+{
     dateDestroy(date);
 }
 
-static int eventManagerMembersAmount(EventManager em)
-{
-    int member_amount = 0;
-    NODE_FOREACH(em->event_manager_member_list, iterator_member)
-    {
-        if(iterator_member != NULL)
-        {
-            member_amount++;
-        }
-    }
-    return member_amount;
-}
-
-
 static Member eventManagerFindMemberbyID(EventManager em, int member_id)
 {
-    return nodeFindMemberById(em->event_manager_member_list, member_id);
-}
-
-static EventManagerResult eventManagerAddMember(EventManager em, Member member)
-{
-    if(em->event_manager_member_list == NULL)
+    PQ_FOREACH(Member, iterator, em->event_manager_member_list)
     {
-        em->event_manager_member_list = nodeCreate(member);
-        if(em->event_manager_member_list == NULL)
+        if(iterator != NULL && *memberGetId(iterator) == member_id)
         {
-            return EM_OUT_OF_MEMORY;
+            return iterator;
         }
-        return EM_SUCCESS;
-
     }
-    if(nodeAddNext(em->event_manager_member_list, member) == NODE_OUT_OF_MEMORY)
-    {
-        return EM_OUT_OF_MEMORY;
-    }
-    return EM_SUCCESS;
+    return NULL;
 }
 
 static bool eventManagerEventExists(EventManager em, Date date, char* event_name)
 {
-    if(em == NULL || date == NULL || event_name == NULL){
+    if(em == NULL || date == NULL || event_name == NULL)
+    {
         return false;
     }
     PQ_FOREACH(Event, iterator, em->event_manager_event_list)
     {
-        if(iterator != NULL){
-            if(dateCompare(eventGetDate(iterator), date) == EQUAL && strcmp(event_name,eventGetName(iterator)) == EQUAL)
+        if(iterator != NULL)
+        {
+            if(dateCompare(eventGetDate(iterator), date) == EQUAL && strcmp(event_name, eventGetName(iterator)) == EQUAL)
             {
                 return true;
             }
         }
     }
-    return false;
-    
+    return false;    
 }
 
-static Event eventManagerfindEventByID(EventManager em, int event_id){
-    if(em == NULL || event_id < 0){
+static Event eventManagerfindEventByID(EventManager em, int event_id)
+{
+    if(em == NULL || event_id < 0)
+    {
         return NULL;
     }
 
-    PQ_FOREACH(Event, iterator, em->event_manager_event_list){
-        if(eventGetID(iterator) == event_id){
+    PQ_FOREACH(Event, iterator, em->event_manager_event_list)
+    {
+        if(eventGetID(iterator) == event_id)
+        {
             return iterator;
         }
     }
@@ -152,33 +184,42 @@ EventManager createEventManager(Date date)
         return NULL;
     }
 
-    event_manager->event_manager_date_created = dateCopy(date);
-    if(event_manager->event_manager_date_created == NULL)
+    event_manager->event_manager_date = dateCopy(date);
+    if(event_manager->event_manager_date == NULL)
     {
         free(event_manager);
         return NULL;
     }
 
-    PriorityQueue priority_queue = pqCreate(copyEvent, destroyEvent, equalEvents, copyDate, destroyDate, compareDates );
+    PriorityQueue event_queue = pqCreate(copyEvent, destroyEvent, equalEvents, copyDate, destroyDate, compareDates);
 
-    if(priority_queue == NULL)
+    if(event_queue == NULL)
     {
-        dateDestroy(event_manager->event_manager_date_created);
+        dateDestroy(event_manager->event_manager_date);
         free(event_manager);
         return NULL;
     }
-    event_manager->event_manager_event_list = priority_queue;
+    event_manager->event_manager_event_list = event_queue;
 
-    event_manager->event_manager_member_list = NULL;
+    PriorityQueue member_queue = pqCreate(copyMember, destroyMember, equalMembers, copyID, destroyID, compareID);
+
+    if(member_queue == NULL)
+    {
+        dateDestroy(event_manager->event_manager_date);
+        pqDestroy(event_queue);
+        free(event_manager);
+        return NULL;
+    }
+    event_manager->event_manager_member_list = member_queue;
 
     return event_manager;   
 }
 
 void destroyEventManager(EventManager em)
 {
-    dateDestroy(em->event_manager_date_created);
+    dateDestroy(em->event_manager_date);
     pqDestroy(em->event_manager_event_list);
-    nodeDestroyAll(em->event_manager_member_list);
+    pqDestroy(em->event_manager_member_list);
     free(em);
 }
 
@@ -187,12 +228,10 @@ EventManagerResult emAddEventByDate(EventManager em, char* event_name, Date date
     debugPrint("adding event");
     if(em == NULL || event_name == NULL || date == NULL)
     {
-        
         return EM_NULL_ARGUMENT;
     }
-    if(dateCompare(date, em->event_manager_date_created) < 0) // TODO: need to ask if >= or >
+    if(dateCompare(date, em->event_manager_date) < 0) 
     {
-        
         return EM_INVALID_DATE;
     }
     if(event_id < 0)
@@ -228,7 +267,6 @@ EventManagerResult emAddEventByDate(EventManager em, char* event_name, Date date
     eventDestroy(event_to_add);
     debugPrint("adding event succeded");
     return EM_SUCCESS;
-
 }
 
 EventManagerResult emAddEventByDiff(EventManager em, char* event_name, int days, int event_id)
@@ -239,7 +277,8 @@ EventManagerResult emAddEventByDiff(EventManager em, char* event_name, int days,
         return EM_NULL_ARGUMENT;
     }
 
-    if(event_id < 0){
+    if(event_id < 0)
+    {
         return EM_INVALID_EVENT_ID;
     }
 
@@ -249,7 +288,7 @@ EventManagerResult emAddEventByDiff(EventManager em, char* event_name, int days,
     }
 
     debugPrint("adding event by diff checks passed");
-    Date date = dateCopy(em->event_manager_date_created);
+    Date date = dateCopy(em->event_manager_date);
     if(date == NULL)
     {
         destroyEventManager(em);
@@ -273,15 +312,18 @@ EventManagerResult emRemoveEvent(EventManager em, int event_id)
     {
         return EM_NULL_ARGUMENT;
     }
+
     if(event_id < 0)
     {
         return EM_INVALID_EVENT_ID;
     }
+
     Event event_to_remove = eventManagerfindEventByID(em, event_id);
     if(event_to_remove == NULL)
     {
         return EM_EVENT_NOT_EXISTS;
     }
+
     pqRemoveElement(em->event_manager_event_list, event_to_remove);
     return EM_SUCCESS;
 }
@@ -292,28 +334,34 @@ EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_dat
     {
         return EM_NULL_ARGUMENT;
     }
-    if(dateCompare(new_date, em->event_manager_date_created) < 0) // TODO: Check if < or <=
+
+    if(dateCompare(new_date, em->event_manager_date) < 0)
     {
         return EM_INVALID_DATE;
     }
+
     if(event_id < 0)
     {
         return EM_INVALID_EVENT_ID;
     }
+
     Event event_to_change = eventManagerfindEventByID(em, event_id);
     if(event_to_change == NULL)
     {
         return EM_EVENT_ID_NOT_EXISTS;
     }
+
     if(eventManagerEventExists(em ,new_date, eventGetName(event_to_change)))
     {
         return EM_EVENT_ALREADY_EXISTS;
     }
+
     if(pqChangePriority(em->event_manager_event_list, event_to_change, new_date, eventGetDate(event_to_change)) == PQ_OUT_OF_MEMORY)
     {
         destroyEventManager(em);
         return EM_OUT_OF_MEMORY;
     }
+
     return EM_SUCCESS;
 }
 
@@ -327,62 +375,31 @@ EventManagerResult emAddMember(EventManager em, char* member_name, int member_id
     {
         return EM_INVALID_MEMBER_ID;
     }
+
     Member member = memberCreate(member_id, member_name);
     if(member == NULL)
     {
         destroyEventManager(em);
         return EM_OUT_OF_MEMORY;
     }
-    if(nodeMemberExists(em->event_manager_member_list,member))
+
+    if(pqContains(em->event_manager_member_list, member))
     {
         memberDestroy(member);
         return EM_MEMBER_ID_ALREADY_EXISTS;
     }
-    if(eventManagerAddMember(em, member) == EM_OUT_OF_MEMORY)
+
+    if(pqInsert(em->event_manager_member_list, member, memberGetId(member)) == PQ_OUT_OF_MEMORY)
     {
         memberDestroy(member);
         destroyEventManager(em);
         return EM_OUT_OF_MEMORY;
     }
-    return EM_SUCCESS;
-    
 
+    return EM_SUCCESS;
 }
 
 EventManagerResult emAddMemberToEvent(EventManager em, int member_id, int event_id)
-{
-    if(em == NULL){
-        return EM_NULL_ARGUMENT;
-    }
-    if(event_id < 0){
-        return EM_INVALID_EVENT_ID;
-    }
-    if(member_id < 0){
-        return EM_INVALID_MEMBER_ID;
-    }
-
-    Event event = eventManagerfindEventByID(em, event_id);
-    if(event == NULL){
-        return EM_EVENT_ID_NOT_EXISTS;
-    }
-    Member member = nodeFindMemberById(em->event_manager_member_list ,member_id);
-    if(member == NULL){
-        return EM_MEMBER_ID_NOT_EXISTS;
-    }
-
-    if(eventMemeberExists(event, member)){
-        return EM_EVENT_AND_MEMBER_ALREADY_LINKED;
-    }
-    
-    if(eventAddMember(event, member) == EVENT_OUT_OF_MEMORY){
-        destroyEventManager(em);
-        return EM_OUT_OF_MEMORY;
-    }
-
-    return EM_SUCCESS;
-}
-
-EventManagerResult emRemoveMemberFromEvent (EventManager em, int member_id, int event_id)
 {
     if(em == NULL)
     {
@@ -396,42 +413,89 @@ EventManagerResult emRemoveMemberFromEvent (EventManager em, int member_id, int 
     {
         return EM_INVALID_MEMBER_ID;
     }
+
     Event event = eventManagerfindEventByID(em, event_id);
     if(event == NULL)
     {
         return EM_EVENT_ID_NOT_EXISTS;
     }
+
     Member member = eventManagerFindMemberbyID(em, member_id);
     if(member == NULL)
     {
         return EM_MEMBER_ID_NOT_EXISTS;
     }
-    if(eventRemoveMember(event ,member) == EVENT_IVALID_MEMBER_ID)
+
+    if(pqContains(eventGetMemberQueue(event), member))
+    {
+        return EM_EVENT_AND_MEMBER_ALREADY_LINKED;
+    }
+    
+    if(pqInsert(eventGetMemberQueue(event), member, memberGetId(member)) == PQ_OUT_OF_MEMORY)
+    {
+        destroyEventManager(em);
+        return EM_OUT_OF_MEMORY;
+    }
+
+    return EM_SUCCESS;
+}
+
+EventManagerResult emRemoveMemberFromEvent(EventManager em, int member_id, int event_id)
+{
+    if(em == NULL)
+    {
+        return EM_NULL_ARGUMENT;
+    }
+    if(event_id < 0)
+    {
+        return EM_INVALID_EVENT_ID;
+    }
+    if(member_id < 0)
+    {
+        return EM_INVALID_MEMBER_ID;
+    }
+
+    Event event = eventManagerfindEventByID(em, event_id);
+    if(event == NULL)
+    {
+        return EM_EVENT_ID_NOT_EXISTS;
+    }
+
+    Member member = eventManagerFindMemberbyID(em, member_id);
+    if(member == NULL)
+    {
+        return EM_MEMBER_ID_NOT_EXISTS;
+    }
+
+    if(pqRemoveElement(eventGetMemberQueue(event), member)== PQ_ELEMENT_DOES_NOT_EXISTS)
     {
         return EM_EVENT_AND_MEMBER_NOT_LINKED;
     }
+
     return EM_SUCCESS;
 
 }
 
 EventManagerResult emTick(EventManager em, int days)
 {
-    if(em == NULL){
+    if(em == NULL)
+    {
         return EM_NULL_ARGUMENT;
     }
-    if(days <= 0){
+    if(days <= 0)
+    {
         return EM_INVALID_DATE;
     }
     
      for(int i = 0; i < days; i++)
     {
         Event first_event = pqGetFirst(em->event_manager_event_list);
-        while(first_event != NULL && dateCompare(eventGetDate(first_event), em->event_manager_date_created) == EQUAL)
+        while(first_event != NULL && dateCompare(eventGetDate(first_event), em->event_manager_date) == EQUAL)
         {
-            emRemoveEvent(em, eventGetID(first_event));
+            pqRemove(em->event_manager_event_list);
             first_event = pqGetFirst(em->event_manager_event_list);
         }
-        dateTick(em->event_manager_date_created);
+        dateTick(em->event_manager_date);
     }
     return EM_SUCCESS;
     
@@ -439,7 +503,8 @@ EventManagerResult emTick(EventManager em, int days)
 
 int emGetEventsAmount(EventManager em)
 {
-    if(em == NULL){
+    if(em == NULL)
+    {
         return -1;
     }
     
@@ -448,7 +513,8 @@ int emGetEventsAmount(EventManager em)
 
 char* emGetNextEvent(EventManager em)
 {
-    if(em == NULL){
+    if(em == NULL)
+    {
         return NULL;
     }
 
@@ -458,11 +524,14 @@ char* emGetNextEvent(EventManager em)
 
 void emPrintAllEvents(EventManager em, const char* file_name)
 {
-    if(em == NULL || file_name == NULL){
+    if(em == NULL || file_name == NULL)
+    {
         return;
     }
+
     FILE* stream = fopen(file_name, "w");
-    if(stream == NULL){
+    if(stream == NULL)
+    {
         return;
     }
     char* current_name, *current_member_name;
@@ -470,58 +539,53 @@ void emPrintAllEvents(EventManager em, const char* file_name)
     int* day = NULL, *month = NULL, *year = NULL;
     PQ_FOREACH(Event, iterator, em->event_manager_event_list)
     {
-        if(iterator != NULL){
+        if(iterator != NULL)
+        {
             current_name = eventGetName(iterator);
             current_date = eventGetDate(iterator);
             dateGet(current_date, day, month, year);
             fprintf(stream,"%s,%d.%d.%d", current_name, *day, *month, *year);
-            NODE_FOREACH(eventGetMemberList(iterator),member_iterator)
+            PQ_FOREACH(Member, member_iterator, eventGetMemberQueue(iterator))
             {
-                if(member_iterator != NULL){
-                   current_member_name =  memberGetName(nodeGetMember(member_iterator));
+                if(member_iterator != NULL)
+                {
+                   current_member_name =  memberGetName(member_iterator);
                    fprintf(stream, ",%s", current_member_name);
                 }
             }
             fprintf(stream,"\n");          
         }
     }
-
     fclose(stream);
 }
 
 void emPrintAllResponsibleMembers(EventManager em, const char* file_name)
 {
-    if(em == NULL || file_name == NULL){
-        return;
-    }
-    
-    int member_amount = eventManagerMembersAmount(em);
-    int* member_ids = malloc(sizeof(int) * member_amount);
-    
-    if(member_ids == NULL)
+    if(em == NULL || file_name == NULL)
     {
-        destroyEventManager(em);
         return;
     }
+    
+    int member_amount = pqGetSize(em->event_manager_member_list);
+ 
     int* member_count = malloc(sizeof(int) * member_amount);
-    if(member_count == NULL){
-        free(member_ids);
+    if(member_count == NULL)
+    {
         destroyEventManager(em);
         return;
     }
     // Count how many events each member is responsible for
     int i = 0;
-    Member current_member;
-    NODE_FOREACH(em->event_manager_member_list, member_iterator){
-        if(member_iterator != NULL){
-            current_member = nodeGetMember(member_iterator);
-            member_ids[i] = memberGetId(current_member);
+    PQ_FOREACH(Member ,member_iterator, em->event_manager_member_list)
+    {
+        if(member_iterator != NULL)
+        {
             member_count[i] = 0;
             PQ_FOREACH(Event, iterator, em->event_manager_event_list)
             {
                 if(iterator != NULL)
                 {
-                    if(eventMemeberExists(iterator,current_member))
+                    if(pqContains(eventGetMemberQueue(iterator), member_iterator))
                     {
                         member_count[i]++;
                     }
@@ -531,56 +595,35 @@ void emPrintAllResponsibleMembers(EventManager em, const char* file_name)
             i++;
         }
     }
-    
-    // Sort the count array, and also the member array
-    maxSortTwoArrays(member_ids, member_count, member_amount);
-
     FILE* stream = fopen(file_name, "w");
-    if(stream == NULL){
+    if(stream == NULL)
+    {
         free(member_count);
-        free(member_ids);
         return;
     }
 
-    char* current_name;
-    for(int j = member_amount - 1; member_amount >= 0; member_amount--){
-        current_member = nodeFindMemberById(em->event_manager_member_list, member_ids[j]);
-        current_name = memberGetName(current_member);
-        fprintf(stream ,"%s,%d\n", current_name, member_count[j]);
+    int event_amount = emGetEventsAmount(em);
+    for(i = event_amount; i > 0; i--)
+    {
+        for(int j = 0; j < member_amount; j++)
+        {
+            if(member_count[j] == event_amount)
+            {
+                int place_in_pq = 0;
+                PQ_FOREACH(Member, member_iterator, em->event_manager_member_list)
+                {
+                    if(place_in_pq == j)
+                    {
+                        fprintf(stream ,"%s,%d\n", memberGetName(member_iterator), member_count[j]);
+                        break;
+                    }
+                    place_in_pq++;
+                }
+
+            }
+        }
     }
-   
     free(member_count);
-    free(member_ids);
     fclose(stream);
 }
 
-static void maxSortTwoArrays(int* arr1, int* arr2, int size)
-{
-    int length = size;
-    for(; length > 1; length--){
-        int i_max = findIndexofMax(arr1, length);
-        swap(&arr1[length - 1], &arr1[i_max]);
-        swap(&arr2[length - 1], &arr2[i_max]);
-    }
-}
-
-static int findIndexofMax(int* arr, int size)
-{
-    int max = arr[0], current_max, index_of_max = 0;
-    for(int i = 1; i < size; i++)
-    {
-        current_max = arr[i];
-        if(current_max > max)
-        {
-            max = current_max;
-            index_of_max = i;
-        }
-    }
-    return index_of_max;
-}
-static void swap(int *p, int *q)
-{
-    int temp = *p;
-    *p = *q;
-    *q = temp;
-}
