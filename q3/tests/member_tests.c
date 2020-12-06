@@ -6,7 +6,7 @@
 #include "test_utilities.h"
 #include "../member.h"
 
-#define NUMBER_TESTS 1
+#define NUMBER_TESTS 3
 
 bool testMemberCopyDestroy(){
     bool result = true;
@@ -15,7 +15,7 @@ bool testMemberCopyDestroy(){
 
     Member member_1 = memberCreate(member_id, member_name);
     Member member_2 = memberCopy(member_1);
-    ASSERT_TEST(memberGetId(member_1) == memberGetId(member_2),destroyMemberCreateDestroy);
+    ASSERT_TEST(*memberGetId(member_1) == *memberGetId(member_2),destroyMemberCreateDestroy);
     ASSERT_TEST(strcmp(memberGetName(member_1),memberGetName(member_2)) == 0 ,destroyMemberCreateDestroy);
 
     destroyMemberCreateDestroy:
@@ -24,12 +24,50 @@ bool testMemberCopyDestroy(){
         return result;
 }
 
+bool testMemberGetters(){
+    bool result = true;
+    int member_id = 1;
+    char* member_name = "gabi";
+
+    Member member_1 = memberCreate(member_id, member_name);
+    ASSERT_TEST(*memberGetId(member_1) == member_id,destroyMemberGetters);
+    ASSERT_TEST(strcmp(memberGetName(member_1),member_name) == 0 ,destroyMemberGetters);
+
+    destroyMemberGetters:
+        memberDestroy(member_1);
+        return result;
+}
+
+bool testMemberEqual(){
+    bool result = true;
+    int member_id = 1;
+    int member_id2 = 2;
+    char* member_name = "gabi";
+    char* member_name2 = "yan";
+
+    Member member_1 = memberCreate(member_id, member_name);
+    Member member_2 = memberCopy(member_1);
+    Member member_3 = memberCreate(member_id2, member_name2);
+    ASSERT_TEST(memberEqual(member_1, member_2) , destroyMemberEqual);
+    ASSERT_TEST(!memberEqual(member_1, member_3) , destroyMemberEqual);
+
+    destroyMemberEqual:
+        memberDestroy(member_1);
+        memberDestroy(member_2);
+        memberDestroy(member_3);
+        return result;
+}
+
 bool (*tests[])(void) = {
-    testMemberCopyDestroy
+    testMemberCopyDestroy,
+    testMemberGetters,
+    testMemberEqual
 };
 
 const char* testNames[] = {
-    "testMemberCopyDestroy"
+    "testMemberCopyDestroy",
+    "testMemberGetters",
+    "testMemberEqual"
 };
 
 int main(int argc, char *argv[]) {

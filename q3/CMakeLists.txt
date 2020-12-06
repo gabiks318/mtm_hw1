@@ -10,5 +10,5 @@ set(CMAKE_C_FLAGS ${MTM_FLAGS_DEBUG})
 add_subdirectory("${PROJECT_SOURCE_DIR}/tests")
 
 link_directories(.)
-add_executable(my_executable tests/event_manager_example_tests.c event_manager.c event.c date.c member_list.c member.c)
+add_executable(my_executable tests/event_tests.c event.c date.c member.c)
 target_link_libraries(my_executable libpriority_queue.a)

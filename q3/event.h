@@ -4,7 +4,8 @@
 #include <stdbool.h>
 #include "member.h"
 #include "date.h"
-#include "member_list.h"
+#include "priority_queue.h"
+
 
 typedef struct Event_t *Event;
 
@@ -13,7 +14,8 @@ typedef enum EventResult_t {
     EVENT_OUT_OF_MEMORY,
     EVENT_NULL_ARGUMENT,
     EVENT_IVALID_MEMBER_ID,
-    EVENT_INVALID_EVENT_ID
+    EVENT_INVALID_EVENT_ID,
+    EVENT_MEMBER_ID_ALREADY_EXISTS
 } EventResult;
 
 /*eventCreate- creates a new event by name, id and date. event id should be positive.
@@ -54,7 +56,6 @@ int eventGetID(Event event);
 
 /*getEvenMemberList- return the pointer to the first member in the list of the members that incharge of the event that sent */
 
-Node getFirstEventMemberList(Event event);   //?????
 
 /*eventAddMember - adding a member to the event member list
                    return EVENT_OUT_OF_MEMORY if dynamic allocation failed.
@@ -65,7 +66,7 @@ EventResult eventAddMember(Event event, Member member);
 
 /*eventRemoveMember - removing a member from the event*/
 
-Node eventGetMemberList(Event event);
+PriorityQueue eventGetMemberQueue(Event event);
 
 EventResult eventRemoveMember(Event event, Member member);
 
