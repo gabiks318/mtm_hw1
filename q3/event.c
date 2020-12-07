@@ -6,8 +6,16 @@
 
 #include "event.h"
 
+// Struct Decleration
 
+struct Event_t{
+    int event_id;
+    char* event_name;
+    PriorityQueue member_queue;
+    Date event_date;
+};
 
+// Function Decleration
 
 static PQElement copyMember(PQElement member);
 static bool equalMembers(PQElement member1, PQElement member2);
@@ -16,14 +24,10 @@ static PQElementPriority copyID(PQElementPriority ID);
 static int compareID(PQElementPriority ID1, PQElementPriority ID2);
 static void destroyID(PQElementPriority ID);
 
-struct Event_t{
-    int event_id;
-    char* event_name;
-    PriorityQueue member_queue;
-    Date event_date;
-}; 
 
+// Function Implementations
 
+// General functions to use in PQ
 static PQElement copyMember(PQElement member)
 {
     return memberCopy(member);
@@ -65,21 +69,19 @@ static void destroyID(PQElementPriority ID)
     free(ID);
 }
 
-
+// Main functions
 
 Event eventCreate(char* event_name, int event_id, Date date)
 {
-    assert(event_name != NULL  || date != NULL);
+    assert(event_name != NULL  || date != NULL || event_id >= 0);
  
     Event event = malloc(sizeof(*event));
-    if(event == NULL)
-    {
+    if(event == NULL){
         return NULL;
     }
     
     event->event_date = dateCopy(date);
-    if(event->event_date == NULL)
-    {
+    if(event->event_date == NULL){
         free(event);
         return NULL;
     }
@@ -87,8 +89,7 @@ Event eventCreate(char* event_name, int event_id, Date date)
     event->event_id = event_id;
 
     char* event_name_copy = malloc(sizeof(char)*(strlen(event_name) + 1));
-    if(event_name_copy == NULL)
-    {
+    if(event_name_copy == NULL){
         free(event->event_date);
         free(event);
         return NULL;
@@ -97,16 +98,13 @@ Event eventCreate(char* event_name, int event_id, Date date)
     event->event_name = event_name_copy;
 
     PriorityQueue member_queue = pqCreate(copyMember, destroyMember, equalMembers, copyID, destroyID, compareID);
-
-    if(member_queue == NULL)
-    {
+    if(member_queue == NULL){
         free(event->event_date);
         free(event->event_name);
         free(event);
         return NULL;
     }
     event->member_queue = member_queue;
-
     return event;
 }
 
@@ -161,7 +159,6 @@ Date eventGetDate(Event event)
 char* eventGetName(Event event)
 {
     assert(event != NULL);
-   
     return event->event_name;
 }
 
@@ -178,4 +175,3 @@ PriorityQueue eventGetMemberQueue(Event event)
 
     return event->member_queue;
 }
-

@@ -6,8 +6,8 @@
 
 #include "member.h"
 
+#define MIN_ID 0
 #define DEBUG false
-
 
 static void printDebug(char* text){
     if(DEBUG){
@@ -16,15 +16,19 @@ static void printDebug(char* text){
     }
 }
 
+// Struct Decleration
+
 struct Member_t{
     int member_id;
     char* member_name;
 };
 
+// Function Implementations
+
 Member memberCreate(const int member_id, const char* member_name)
 {
     printDebug("Creating member");
-    assert(member_name != NULL || member_id >= 0);
+    assert(member_name != NULL || member_id >= MIN_ID);
 
     Member member = malloc(sizeof(*member));
     if(member == NULL)

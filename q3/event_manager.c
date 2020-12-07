@@ -9,7 +9,7 @@
 #include "member.h"
 #include "event.h"
 
-#define DEBUG false
+#define DEBUG true
 #define EQUAL 0
 
 static void debugPrint(char* text){
@@ -115,7 +115,7 @@ static PQElementPriority copyDate(PQElementPriority date)
 
 static int compareDates(PQElementPriority date1, PQElementPriority date2)
 {
-    return dateCompare(date1, date2);
+    return dateCompare(date2, date1);
 }
 
 static void destroyDate(PQElementPriority date)
@@ -160,10 +160,10 @@ static Event eventManagerfindEventByID(EventManager em, int event_id)
     {
         return NULL;
     }
-
     PQ_FOREACH(Event, iterator, em->event_manager_event_list)
     {
-        if(eventGetID(iterator) == event_id)
+
+        if(iterator!= NULL && eventGetID(iterator) == event_id)
         {
             return iterator;
         }
@@ -330,38 +330,44 @@ EventManagerResult emRemoveEvent(EventManager em, int event_id)
 
 EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_date)
 {
+    debugPrint("0");
     if(em == NULL || new_date == NULL)
     {
         return EM_NULL_ARGUMENT;
     }
+    debugPrint("1");
 
     if(dateCompare(new_date, em->event_manager_date) < 0)
     {
         return EM_INVALID_DATE;
     }
+    debugPrint("2");
 
     if(event_id < 0)
     {
         return EM_INVALID_EVENT_ID;
     }
-
+    debugPrint("going to search for event now");
     Event event_to_change = eventManagerfindEventByID(em, event_id);
     if(event_to_change == NULL)
     {
+        debugPrint("returning event not found");
+
         return EM_EVENT_ID_NOT_EXISTS;
     }
-
+        debugPrint("checking if exists");
     if(eventManagerEventExists(em ,new_date, eventGetName(event_to_change)))
     {
         return EM_EVENT_ALREADY_EXISTS;
     }
-
-    if(pqChangePriority(em->event_manager_event_list, event_to_change, new_date, eventGetDate(event_to_change)) == PQ_OUT_OF_MEMORY)
+        debugPrint("changing");
+    Event copy_event_to_change= copyEvent(event_to_change);
+    if(pqChangePriority(em->event_manager_event_list, copy_event_to_change, eventGetDate(copy_event_to_change), new_date) == PQ_OUT_OF_MEMORY)//changed her
     {
         destroyEventManager(em);
         return EM_OUT_OF_MEMORY;
     }
-
+    destroyEvent(copy_event_to_change);
     return EM_SUCCESS;
 }
 
@@ -534,25 +540,32 @@ void emPrintAllEvents(EventManager em, const char* file_name)
     }
 
     FILE* stream = fopen(file_name, "w");
+
     if(stream == NULL)
     {
         return;
     }
+    debugPrint("opened the file");
     char* current_name, *current_member_name;
     Date current_date;
-    int* day = NULL, *month = NULL, *year = NULL;
+    int day, month, year;
     PQ_FOREACH(Event, iterator, em->event_manager_event_list)
     {
         if(iterator != NULL)
         {
+            debugPrint("going on events");
             current_name = eventGetName(iterator);
             current_date = eventGetDate(iterator);
-            dateGet(current_date, day, month, year);
-            fprintf(stream,"%s,%d.%d.%d", current_name, *day, *month, *year);
-            PQ_FOREACH(Member, member_iterator, eventGetMemberQueue(iterator))
+            dateGet(current_date, &day, &month, &year);
+            fprintf(stream,"%s,%d.%d.%d", current_name, day, month, year);
+            debugPrint("going into members loop 1");
+            PriorityQueue current_event_member_queue = eventGetMemberQueue(iterator);
+            debugPrint("going into members loop 2");
+            PQ_FOREACH(Member, member_iterator, current_event_member_queue)
             {
                 if(member_iterator != NULL)
                 {
+                    debugPrint("going on members");
                    current_member_name =  memberGetName(member_iterator);
                    fprintf(stream, ",%s", current_member_name);
                 }
@@ -571,7 +584,6 @@ void emPrintAllResponsibleMembers(EventManager em, const char* file_name)
     }
     
     int member_amount = pqGetSize(em->event_manager_member_list);
- 
     int* member_count = malloc(sizeof(int) * member_amount);
     if(member_count == NULL)
     {

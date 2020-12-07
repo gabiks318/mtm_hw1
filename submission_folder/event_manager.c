@@ -9,7 +9,7 @@
 #include "member.h"
 #include "event.h"
 
-#define DEBUG true
+#define DEBUG false
 #define EQUAL 0
 
 static void debugPrint(char* text){
@@ -330,6 +330,9 @@ EventManagerResult emRemoveEvent(EventManager em, int event_id)
 
 EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_date)
 {
+    int day,month,year;
+    dateGet(new_date,&day,&month,&year);
+    printf("%d.%d.%d\n",day,month,year);
     debugPrint("0");
     if(em == NULL || new_date == NULL)
     {
@@ -362,15 +365,27 @@ EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_dat
     }
         debugPrint("changing");
 
-    if(pqChangePriority(em->event_manager_event_list, event_to_change, eventGetDate(event_to_change), new_date) == PQ_OUT_OF_MEMORY)//changed her
+    Event copy_event_to_change= copyEvent(event_to_change);
+    char* event_name = eventGetName(copy_event_to_change);
+    printf("%s\n",event_name);
+    dateGet(eventGetDate(copy_event_to_change),&day,&month,&year);
+    printf("%d.%d.%d\n",day,month,year);
+    dateGet(new_date,&day,&month,&year);
+    printf("%d.%d.%d\n",day,month,year);
+    if(pqChangePriority(em->event_manager_event_list, copy_event_to_change, eventGetDate(event_to_change), new_date) == PQ_OUT_OF_MEMORY)//changed her
     {
         destroyEventManager(em);
         return EM_OUT_OF_MEMORY;
     }
-    if(dateCompare(eventGetDate(event_to_change), new_date) != 0 )//need to delte
-    {
-        debugPrint("not a good date change");
-    }
+    dateGet(eventGetDate(eventManagerfindEventByID(em,4)),&day,&month,&year);
+    printf("%d.%d.%d\n",day,month,year);
+    dateGet(eventGetDate(eventManagerfindEventByID(em,3)),&day,&month,&year);
+    printf("%d.%d.%d\n",day,month,year);
+     dateGet(eventGetDate(eventManagerfindEventByID(em,2)),&day,&month,&year);
+    printf("%d.%d.%d\n",day,month,year);
+     dateGet(eventGetDate(eventManagerfindEventByID(em,1)),&day,&month,&year);
+    printf("%d.%d.%d\n",day,month,year);
+    destroyEvent(copy_event_to_change);
 
     return EM_SUCCESS;
 }
