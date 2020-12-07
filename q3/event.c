@@ -131,13 +131,14 @@ Event eventCopy(Event event)
         return NULL;
     }
 
-    Event event_copy = eventCreate(event->event_name, event->event_id, dateCopy(event->event_date));
+    Event event_copy = eventCreate(event->event_name, event->event_id, event->event_date);
     if(event_copy == NULL)
     {
         pqDestroy(member_queue_copy);
         return NULL;
     }
-
+    
+    pqDestroy(event_copy->member_queue);
     event_copy->member_queue = member_queue_copy;
 
     return event_copy;

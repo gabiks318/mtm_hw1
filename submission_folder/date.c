@@ -5,6 +5,13 @@
 
 #define MAX_DAY 30
 #define MAX_MONTH 12
+#define FIRST_DAY 1
+#define FIRST_MONTH 1
+#define DATES_EQUAL 0
+#define DATE1_FIRST 1
+#define DATE2_FIRST -1
+
+// Struct decleration
 
 struct Date_t {
     int day;
@@ -12,8 +19,13 @@ struct Date_t {
     int year;
 };
 
+/*
+* isDateLegal: checks whether the inserted legal
+* return - bool value whether date is legal
+*/
 static bool isDateLegal(int day, int month , int year);
 
+// Function implementations
 
 Date dateCreate(int day, int month, int year)
 {
@@ -30,9 +42,9 @@ Date dateCreate(int day, int month, int year)
     date->month = month;
     date->year = year;
 
-
     return date;
 }
+
 void dateDestroy(Date date)
 {
     if(date == NULL)
@@ -41,6 +53,7 @@ void dateDestroy(Date date)
     }
     free(date);
 }
+
 Date dateCopy(Date date)
 {
     if(date == NULL)
@@ -54,6 +67,7 @@ Date dateCopy(Date date)
     }
     return copy_date;
 }
+
 bool dateGet(Date date, int* day, int* month, int* year)
 {
     if(date == NULL || day == NULL || month == NULL || year == NULL)
@@ -66,36 +80,37 @@ bool dateGet(Date date, int* day, int* month, int* year)
   
     return true;
 }
+
 int dateCompare(Date date1, Date date2)
 {
     if(date1 == NULL || date2 == NULL)
     {
-        return 0;
+        return DATES_EQUAL;
     }
     
     if(date1->year > date2->year){
-        return 1;
+        return DATE1_FIRST;
     } else if(date1->year < date2->year){
-        return -1;
+        return DATE2_FIRST;
     } else {
         if(date1->month > date2->month){
-            return 1;
+            return DATE1_FIRST;
         } else if(date1->month < date2->month){
-            return -1;
+            return DATE2_FIRST;
         } else {
             if(date1->day > date2->day){
-                return 1;
+                return DATE1_FIRST;
             } else if(date1->day < date2->day){
-                return -1;
+                return DATE2_FIRST;
             } else {
-                return 0;
+                return DATES_EQUAL;
             }
         }
     }
 }
+
 void dateTick(Date date)
 {
-
     if(date == NULL)
     {
         return;
@@ -103,13 +118,13 @@ void dateTick(Date date)
     if(date->day == MAX_DAY && date->month == MAX_MONTH)
     {
         date->year++;
-        date->month = 1;
-        date->day = 1;
+        date->month = FIRST_MONTH;
+        date->day = FIRST_DAY;
         return;
     }
     if(date->day == MAX_DAY)
     {
-        date->day = 1;
+        date->day = FIRST_DAY;
         date->month++;
         return;
     }
@@ -119,7 +134,7 @@ void dateTick(Date date)
 
 static bool isDateLegal(int day, int month , int year)
 {
-    if(day > MAX_DAY || day < 1 || month > MAX_MONTH || month < 1)
+    if(day > MAX_DAY || day < FIRST_DAY || month > MAX_MONTH || month < FIRST_MONTH)
     {
         return false;
     }

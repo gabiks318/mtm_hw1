@@ -2,11 +2,12 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "member.h"
 
+#define MIN_ID 0
 #define DEBUG false
-
 
 static void printDebug(char* text){
     if(DEBUG){
@@ -15,19 +16,20 @@ static void printDebug(char* text){
     }
 }
 
+// Struct Decleration
+
 struct Member_t{
     int member_id;
     char* member_name;
 };
 
-Member memberCreate(int member_id, char* member_name)
+// Function Implementations
+
+Member memberCreate(const int member_id, const char* member_name)
 {
     printDebug("Creating member");
-    if(member_name == NULL || member_id < 0)
-    {
-        return NULL;
-    }
-    
+    assert(member_name != NULL || member_id >= MIN_ID);
+
     Member member = malloc(sizeof(*member));
     if(member == NULL)
     {
@@ -55,31 +57,23 @@ void memberDestroy(Member member)
     free(member);
 }
 
-int* memberGetId(Member member){
-    if(member == NULL)
-    {
-        return NULL;
-    }
+int* memberGetId(Member member)
+{
+    assert(member != NULL);
 
     return &member->member_id;
 }
 
 char* memberGetName(Member member)
 {
-    if(member == NULL){
-        return '\0';
-    }
+    assert(member != NULL);
 
     return member->member_name;
 }
 
 bool memberEqual(Member member1, Member member2)
 {
-    if(member1 == NULL || member2 == NULL)
-    {
-        printDebug("Member is null");
-        return false;
-    }
+    assert(member1 != NULL || member2 != NULL);
     printDebug("Comparing members");
     return member1->member_id == member2->member_id;
 }
