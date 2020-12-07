@@ -519,6 +519,10 @@ char* emGetNextEvent(EventManager em)
     }
 
     Event next_event = pqGetFirst(em->event_manager_event_list);
+    if(next_event == NULL)
+    {
+        return NULL;
+    }
     return eventGetName(next_event);
 }
 
