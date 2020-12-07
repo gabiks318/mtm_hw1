@@ -467,9 +467,11 @@ bool testChangePriorityByRef(){
  
     int* elem1_ptr =(int *)pqGetFirst(pq);
     ASSERT_TEST(*elem1_ptr == elem1, destroy);
+    printf("original: %d, queue: %d\n", *elem1_ptr, *(int *)pqGetFirst(pq));
  
-    ASSERT_TEST(pqChangePriority(pq, elem1_ptr, elem1_ptr, elem1_ptr) == PQ_SUCCESS, destroy);
+    ASSERT_TEST(pqChangePriority(pq, &elem1, &elem1, &elem1) == PQ_SUCCESS, destroy);
     elem1_ptr = (int *)pqGetFirst(pq);
+    printf("original: %d, queue: %d\n", *elem1_ptr, *(int *)pqGetFirst(pq));
     ASSERT_TEST(*elem1_ptr == elem1, destroy);
  
     destroy:
@@ -927,7 +929,7 @@ const char *testFailDescriptions[] = {
 };
 
 
-#define NUMBER_TESTS 39
+#define NUMBER_TESTS 38
 
 int main(int argc, char **argv) {
     if (argc == 1) {

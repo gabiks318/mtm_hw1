@@ -9,4 +9,4 @@ set(CMAKE_C_FLAGS ${MTM_FLAGS_DEBUG})
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/tests")
 
-add_executable(my_executable tests/testsofek.c priority_queue.c)
+add_executable(my_executable tests/testsofek.c priority_queue.c node.c)
