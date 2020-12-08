@@ -48,5 +48,7 @@ int eventGetID(Event event);
 
 PriorityQueue eventGetMemberQueue(Event event);
 
+void eventDateChange(Event event, Date date);
+
 
 #endif

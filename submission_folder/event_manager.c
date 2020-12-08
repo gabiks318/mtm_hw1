@@ -330,9 +330,6 @@ EventManagerResult emRemoveEvent(EventManager em, int event_id)
 
 EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_date)
 {
-    int day,month,year;
-    dateGet(new_date,&day,&month,&year);
-    printf("%d.%d.%d\n",day,month,year);
     debugPrint("0");
     if(em == NULL || new_date == NULL)
     {
@@ -354,39 +351,30 @@ EventManagerResult emChangeEventDate(EventManager em, int event_id, Date new_dat
     Event event_to_change = eventManagerfindEventByID(em, event_id);
     if(event_to_change == NULL)
     {
-        debugPrint("returning event not found");
+    debugPrint("returning event not found");
 
         return EM_EVENT_ID_NOT_EXISTS;
     }
-        debugPrint("checking if exists");
+    debugPrint("checking if exists");
     if(eventManagerEventExists(em ,new_date, eventGetName(event_to_change)))
     {
         return EM_EVENT_ALREADY_EXISTS;
     }
-        debugPrint("changing");
-
-    Event copy_event_to_change= copyEvent(event_to_change);
-    char* event_name = eventGetName(copy_event_to_change);
-    printf("%s\n",event_name);
-    dateGet(eventGetDate(copy_event_to_change),&day,&month,&year);
-    printf("%d.%d.%d\n",day,month,year);
-    dateGet(new_date,&day,&month,&year);
-    printf("%d.%d.%d\n",day,month,year);
+    debugPrint("changing");
+    Event copy_event_to_change= eventCopy(event_to_change);
+    if(copy_event_to_change == NULL)
+    {
+        destroyEventManager(em);
+        return EM_OUT_OF_MEMORY;
+    }
     if(pqChangePriority(em->event_manager_event_list, copy_event_to_change, eventGetDate(event_to_change), new_date) == PQ_OUT_OF_MEMORY)//changed her
     {
         destroyEventManager(em);
         return EM_OUT_OF_MEMORY;
     }
-    dateGet(eventGetDate(eventManagerfindEventByID(em,4)),&day,&month,&year);
-    printf("%d.%d.%d\n",day,month,year);
-    dateGet(eventGetDate(eventManagerfindEventByID(em,3)),&day,&month,&year);
-    printf("%d.%d.%d\n",day,month,year);
-     dateGet(eventGetDate(eventManagerfindEventByID(em,2)),&day,&month,&year);
-    printf("%d.%d.%d\n",day,month,year);
-     dateGet(eventGetDate(eventManagerfindEventByID(em,1)),&day,&month,&year);
-    printf("%d.%d.%d\n",day,month,year);
+    Event event_changed = eventManagerfindEventByID(em, event_id);
+    eventDateChange(event_changed, new_date);
     destroyEvent(copy_event_to_change);
-
     return EM_SUCCESS;
 }
 
@@ -420,6 +408,7 @@ EventManagerResult emAddMember(EventManager em, char* member_name, int member_id
         destroyEventManager(em);
         return EM_OUT_OF_MEMORY;
     }
+    memberDestroy(member);
 
     return EM_SUCCESS;
 }
@@ -642,7 +631,7 @@ void emPrintAllResponsibleMembers(EventManager em, const char* file_name)
     {
         for(int j = 0; j < member_amount; j++)
         {
-            if(member_count[j] == event_amount)
+            if(member_count[j] == i)
             {
                 int place_in_pq = 0;
                 PQ_FOREACH(Member, member_iterator, em->event_manager_member_list)

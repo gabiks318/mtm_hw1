@@ -78,7 +78,7 @@ bool testBigEventManager() {
     Date event_date1 = dateCreate(1,12,2020);
     Date event_date2 = dateCreate(5,12,2020);
     Date event_date3 = dateCreate(10,12,2020);
-    Date event_date4 = dateCreate(29,12,2021);
+    Date event_date4 = dateCreate(11,06,2021);
     Date event_date5 = dateCreate(1,11,2020);
     ASSERT_TEST(emAddEventByDate(em, event_name1, event_date1, 1) == EM_SUCCESS,destroyDates);
     ASSERT_TEST(emAddEventByDate(em, event_name2, event_date2, 2) == EM_SUCCESS,destroyDates);
@@ -86,7 +86,7 @@ bool testBigEventManager() {
     ASSERT_TEST(emAddEventByDate(em, event_name4, event_date4, 4) == EM_SUCCESS,destroyDates);
     ASSERT_TEST(emAddEventByDate(em, event_name5, event_date5, 5) == EM_INVALID_DATE,destroyDates);
     ASSERT_TEST(emGetEventsAmount(em) == 4, destroyDates);
-    Date new_date_to_event_4 = dateCreate(27,12,2020);
+    Date new_date_to_event_4 = dateCreate(4,12,2020);
     debugPrint("1\n");
     ASSERT_TEST(emChangeEventDate(em, 8, new_date_to_event_4) == EM_EVENT_ID_NOT_EXISTS, destroyDates2);
         debugPrint("1");
@@ -144,7 +144,47 @@ bool testBigEventManager() {
     ASSERT_TEST(emRemoveMemberFromEvent(em, 8 , 1) == EM_MEMBER_ID_NOT_EXISTS, destroyDates2);
     ASSERT_TEST(emRemoveMemberFromEvent(em, 2 , 1) == EM_EVENT_AND_MEMBER_NOT_LINKED, destroyDates2);
    
-    emPrintAllEvents(em, "fileyantest.txt");
+    emPrintAllEvents(em, "testPrintEventsYan.txt");
+    /*output should be:
+    event1,1.12.2020,yan1,yan5
+    event4,4.12.2020,yan1,yan5
+    event2,5.12.2020,yan1,yan2,yan3,yan4,yan5
+    event3,10.12.2020,yan1,yan2
+    */
+
+    emPrintAllResponsibleMembers(em, "testPrintMembersYan.txt");
+    /*output should be:
+    yan1,4
+    yan5,3
+    yan2,2
+    yan3,1
+    yan4,1
+    */
+
+    ASSERT_TEST(emTick(em, 4) == EM_SUCCESS, destroyDates2);
+    ASSERT_TEST(emGetEventsAmount(em) == 2, destroyDates2);
+
+    emPrintAllEvents(em, "testPrintEventsYanAfterTick.txt");
+     /*output should be:
+    event2,5.12.2020,yan1,yan2,yan3,yan4,yan5
+    event3,10.12.2020,yan1,yan2
+    */
+    emPrintAllResponsibleMembers(em, "testPrintMembersYanAfterTick.txt");
+    /*output should be:
+    yan1,2
+    yan2,2
+    yan3,1
+    yan4,1
+    yan5,1
+    */
+
+    ASSERT_TEST(emTick(em, 2) == EM_SUCCESS, destroyDates2);
+    ASSERT_TEST(emGetEventsAmount(em) == 1, destroyDates2);
+    ASSERT_TEST(emTick(em, 20) == EM_SUCCESS, destroyDates2);
+    ASSERT_TEST(emGetEventsAmount(em) == 0, destroyDates2);
+    ASSERT_TEST(emAddEventByDate(em, event_name3, event_date3, 3) == EM_INVALID_DATE,destroyDates2);
+
+    //Good Luck!
 
 destroyDates2:
     dateDestroy(new_date_to_event_4);
@@ -154,7 +194,6 @@ destroyDates:
     dateDestroy(event_date3);
     dateDestroy(event_date4);
     dateDestroy(event_date5);
-
     dateDestroy(start_date);
     destroyEventManager(em);
     return result;

@@ -175,3 +175,10 @@ PriorityQueue eventGetMemberQueue(Event event)
 
     return event->member_queue;
 }
+
+void eventDateChange(Event event, Date date)
+{
+    dateDestroy(event->event_date);
+    Date new_date = dateCopy(date);
+    event->event_date = new_date;
+}
