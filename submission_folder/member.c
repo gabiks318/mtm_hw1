@@ -7,14 +7,6 @@
 #include "member.h"
 
 #define MIN_ID 0
-#define DEBUG false
-
-static void printDebug(char* text){
-    if(DEBUG){
-        printf(text);
-        printf("\n");
-    }
-}
 
 // Struct Decleration
 
@@ -27,7 +19,6 @@ struct Member_t{
 
 Member memberCreate(const int member_id, const char* member_name)
 {
-    printDebug("Creating member");
     assert(member_name != NULL || member_id >= MIN_ID);
 
     Member member = malloc(sizeof(*member));
@@ -46,7 +37,6 @@ Member memberCreate(const int member_id, const char* member_name)
     }
     strcpy(member_name_copy, member_name);
     member->member_name = member_name_copy;
-    printDebug("member created");
 
     return member;
 }
@@ -74,7 +64,6 @@ char* memberGetName(Member member)
 bool memberEqual(Member member1, Member member2)
 {
     assert(member1 != NULL || member2 != NULL);
-    printDebug("Comparing members");
     return member1->member_id == member2->member_id;
 }
 
