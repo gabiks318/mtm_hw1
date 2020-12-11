@@ -1,6 +1,6 @@
 CC = gcc 
-OBJS1 = event.o date.o event_manager.o member.o event_manager_example_tests.o
-OBJS2 = priority_queue.o pq_example_tests.o node.o
+OBJS1 = event.o date.o event_manager.o member.o event_manager_tests.o
+OBJS2 = priority_queue.o pq_tests.o node.o
 EXEC1 = event_manager 
 EXEC2 = priority_queue
 DEBUG = -pedantic-errors -DNDEBUG -g 
@@ -13,11 +13,11 @@ $(EXEC1) : $(OBJS1)
 $(EXEC2) : $(OBJS2)
 	$(CC) $(DEBUG) $(CFLAGS) $(OBJS2) -o $@
 
-pq_example_tests.o: pq_example_tests.c priority_queue.h test_utilities.h
-	$(CC) -c $(DEBUG) $(CFLAGS) $*.c
+pq_tests.o: tests/pq_tests.c priority_queue.h tests/test_utilities.h
+	$(CC) -c $(DEBUG) $(CFLAGS) $/tests/pq_tests.c
 
-event_manager_example_tests.o: event_manager_example_tests.c event_manager.h test_utilities.h
-	$(CC) -c $(DEBUG) $(CFLAGS) $*.c
+event_manager_tests.o: tests/event_manager_tests.c event_manager.h tests/test_utilities.h
+	$(CC) -c $(DEBUG) $(CFLAGS) $/tests/event_manager_tests.c
 
 priority_queue.o: priority_queue.c priority_queue.h node.h
 	$(CC) -c $(DEBUG) $(CFLAGS) $*.c
@@ -40,4 +40,3 @@ member.o: member.c member.h
 clean:
 	rm -f $(OBJS1)
 	rm -f $(OBJS2)
-
