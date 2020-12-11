@@ -11,32 +11,83 @@
 
 #define EQUAL 0
 
-
-static bool eventManagerEventExists(EventManager em, Date date, char* event_name);
-static Event eventManagerfindEventByID(EventManager em, int event_id);
-static Member eventManagerFindMemberbyID(EventManager em, int member_id);
-static bool eventManagerEventIdExists(EventManager em,int event_id);
-
-static PQElement copyEvent(PQElement event);
-static bool equalEvents(PQElement event1, PQElement event2);
-static void destroyEvent(PQElement event);
-static PQElementPriority copyDate(PQElementPriority date);
-static int compareDates(PQElementPriority date1, PQElementPriority date2);
-static void destroyDate(PQElementPriority date);
-
-static PQElement copyMember(PQElement member);
-static bool equalMembers(PQElement member1, PQElement member2);
-static void destroyMember(PQElement member);
-static PQElementPriority copyID(PQElementPriority ID);
-static int compareID(PQElementPriority ID1, PQElementPriority ID2);
-static void destroyID(PQElementPriority ID);
-
+// Struct Decleration
 
 struct EventManager_t{
     Date event_manager_date;
     PriorityQueue event_manager_event_list;
     PriorityQueue event_manager_member_list;
 };
+
+// Function declerations
+
+/*
+* eventManagerEventExists- check whether event exists in event manager
+*                          return- True if event in event manager 
+*                                  False if not or NULL value inserted
+*/
+static bool eventManagerEventExists(EventManager em, Date date, char* event_name);
+
+/*
+* eventManagerfindEventByID- find event by its ID
+*                            return- the Event if found
+*                                    NULL if not found or invalid value entered
+*/
+static Event eventManagerfindEventByID(EventManager em, int event_id);
+
+/*
+* eventManagerFindMemberbyID- return member by member ID from event manager
+*                             return- Memeber if found
+*                                     NULL if not found or invalid id or null value sent
+*/
+static Member eventManagerFindMemberbyID(EventManager em, int member_id);
+
+/*
+* eventManagerMembersAmount- return member cound in event manager
+*
+*/
+static bool eventManagerEventIdExists(EventManager em,int event_id);
+
+// Generic functions
+
+// copyEvent- Generic function to copy event
+static PQElement copyEvent(PQElement event);
+
+// equalEvents- Generic function to compare events
+static bool equalEvents(PQElement event1, PQElement event2);
+
+// destroyEvent- Generic function to destroy event
+static void destroyEvent(PQElement event);
+
+// copyDate- Generic function to copy date
+static PQElementPriority copyDate(PQElementPriority date);
+
+// compareDates- Generic function to compare dates, based on date comparison function
+static int compareDates(PQElementPriority date1, PQElementPriority date2);
+
+// destroyDate- Generic function to destroy date
+static void destroyDate(PQElementPriority date);
+
+// copyMember- Generic function to copy member
+static PQElement copyMember(PQElement member);
+
+// equalMembers- Generic function to compare members
+static bool equalMembers(PQElement member1, PQElement member2);
+
+// destroyMember- Generic function to destroy member
+static void destroyMember(PQElement member);
+
+// copyID- Generic function to copy ID
+static PQElementPriority copyID(PQElementPriority ID);
+
+// compareID- Generic function to compare ints, return the difference
+static int compareID(PQElementPriority ID1, PQElementPriority ID2);
+
+// destroyID- Generic function to destroy ID
+static void destroyID(PQElementPriority ID);
+
+
+// Function implementations
 
 static PQElement copyMember(PQElement member)
 {
